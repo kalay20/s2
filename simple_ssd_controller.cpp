@@ -703,13 +703,8 @@ void simple_ssd_controller::load_last_use(std::string trace_path, int number_of_
 		i++;
 	}
 	trace_last_ifs.close();
-	//for(i=0; i < number_of_dice; i++){
-	//	if(ssd.get_die_ftls()[i]->get_p_meta_table()->num_of_free_pbs < 970)cout <<"!!"<<endl;
-	//	cout << ssd.get_die_ftls()[i]->get_p_meta_table()->pb_meta_array[970].num_of_live_pages << " ";
-	//}
 }
 void simple_ssd_controller::save_last_use(std::string trace_path, double last_info, int number_of_dice) const {
-	cout <<"@@"<<endl;
 	string trace_last_path = trace_path + ".last";
 	ofstream trace_last_ofs;
 	trace_last_ofs.open(trace_last_path.c_str());
@@ -773,6 +768,4 @@ void simple_ssd_controller::save_last_use(std::string trace_path, double last_in
 		// ===================
 		trace_last_ofs.close();
 	}
-	//for(int i=0; i < number_of_dice; i++)
-	//	cout << "test " << die_ftls[i]->get_p_meta_table()->pb_meta_array[970].num_of_live_pages << " ";
 }
