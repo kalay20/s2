@@ -12,7 +12,6 @@ elif [ "$user" == "JHLin" ]
 then
 	echo "Welcome! J.H. Lin."
 	sed -i -e "s/systemc-2.3.0/sysC-2.3.0/g" Makefile
-
 fi
 
 
