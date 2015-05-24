@@ -5,11 +5,11 @@ workload_burst=(/home/r03/sin19682004/test/simulator2/trace/mse_burst.trace /hom
 #workload_short=(mse msn msl usr1 src10 synf_b)
 workload_short=(mse_b msn_b synf_b msl usr1 src10)
 workload_dst=( mse msn msl usr1 src10 synf )
-workload_dir=trace
+workload_dir=
 
 for (( i=0; i<6; i++ ))
 do
-	rsync -avP "${workload_src["$i"]}" "$workload_dir"/"${workload_dst["$i"]}"
+	rsync -avP "${workload_src["$i"]}" "$workload_dir""${workload_dst["$i"]}"
 done
 
 

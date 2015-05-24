@@ -13,6 +13,10 @@ do
 	for (( j=0; j<5; j++ ))
 	do
 		mkdir "${d1["$i"]}"/"${prefix["$j"]}"
+		if [ "${d1["$i"]}"==out ]
+		then
+			mkdir "${d1["$i"]}"/"${prefix["$j"]}"/stderr
+		fi
 	done
 done
 
