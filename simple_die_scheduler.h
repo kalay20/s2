@@ -54,6 +54,14 @@ class simple_die_scheduler :
 		SC_HAS_PROCESS(simple_die_scheduler);
 		simple_die_scheduler(sc_core::sc_module_name module_name, gyc_bus_pkt_mm* global_mm, int die_idx);
 		sc_port<gyc_bus_dev_cb> ch_port;
+                // LaiYang
+                ppn_t number_of_gc_page_read_f;
+                ppn_t number_of_gc_page_read_b;
+                ppn_t number_of_gc_page_erase_f;
+                ppn_t number_of_gc_page_erase_b;
+                ppn_t number_of_gc_page_write_f;
+                ppn_t number_of_gc_page_write_b;
+                // end LaiYang
 
 		ppn_t number_of_io_page_read;
 		ppn_t number_of_io_page_write;

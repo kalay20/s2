@@ -6,6 +6,9 @@
 #include <cmath>
 #include <new>
 #include <iostream>
+// LaiYang
+#include <queue>
+// end LaiYang
 
 #include "systemc.h"
 
@@ -60,6 +63,11 @@ class simple_die_ftl : public sc_module, public ssd_die_ftl_interface {
 		wr_ptr_t* get_wr_ptr_for_short(int i){ return wr_ptr_for_short_io_queue[i]; }
 		wr_ptr_t* get_wr_ptr_for_long(int i){ return wr_ptr_for_long_io_queue[i]; }
 		wr_ptr_t* get_wr_ptr_for_gc(int i){ return wr_ptr_for_gc[i]; }
+		
+		// LaiYang
+		std::deque<int>* live_page_copy_per_gc;
+		int* number_of_gc_trigger;
+		// end LaiYang
 
 #ifdef GYC_PAPER_OVERLOAD_PROTECTION
 		ppn_t m_current_busy_period_slc_write_count;

@@ -18,6 +18,15 @@ simple_die_scheduler::simple_die_scheduler(sc_module_name module_name, gyc_bus_p
 	_ftl = NULL;
 	_callback = NULL;
 	_gc_priority = BACKGROUND_GC;
+	
+	// LaiYang
+	ppn_t number_of_gc_page_read_f = 0;
+	ppn_t number_of_gc_page_read_b = 0;
+	ppn_t number_of_gc_page_erase_f = 0;
+	ppn_t number_of_gc_page_erase_b = 0;
+	ppn_t number_of_gc_page_write_f = 0;
+	ppn_t number_of_gc_page_write_b = 0;
+	// end LaiYang
 
 	number_of_io_page_read = 0;
 	number_of_io_page_write = 0;
@@ -359,10 +368,13 @@ gyc_bus_pkt* simple_die_scheduler::apply_next_op() {
 	gyc_bus_pkt* next_op = NULL;
 	if (_gc_priority == FOREGROUND_GC) {
 		if ((next_op = apply_next_gc_rd_op()) != NULL) {
+            number_of_gc_page_read_f++;
 			return next_op;
 		} else if ((next_op = apply_next_gc_wr_op()) != NULL) {
+            number_of_gc_page_write_f++;
 			return next_op;
 		} else if ((next_op = apply_next_gc_er_op()) != NULL) {
+            number_of_gc_page_erase_f++;
 			return next_op;
 		} else if ((next_op = apply_next_io_rd_op()) != NULL) {
 			return next_op;
@@ -377,10 +389,13 @@ gyc_bus_pkt* simple_die_scheduler::apply_next_op() {
 		} else if ((next_op = apply_next_io_wr_op()) != NULL) {
 			return next_op;
 		} else if ((next_op = apply_next_gc_rd_op()) != NULL) {
+            number_of_gc_page_read_b++;
 			return next_op;
 		} else if ((next_op = apply_next_gc_wr_op()) != NULL) {
+            number_of_gc_page_write_b++;
 			return next_op;
 		} else if ((next_op = apply_next_gc_er_op()) != NULL) {
+            number_of_gc_page_erase_b++;
 			return next_op;
 		} else {
 			return NULL;
