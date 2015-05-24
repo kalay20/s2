@@ -22,18 +22,10 @@ bs=( 128 256 512 1024 )
 
 change=${change:-1}
 
-if [ $change -eq 1 ]; then
-	config_dir=config/wl_die
-elif [ $change -eq 2 ] ; then
-	config_dir=config/block_size_config
-elif [ $change -eq 3 ] ; then
-	config_dir=config/3_factor
-elif [ $change -eq 4 ] ; then
-	config_dir=config/el_die
-elif [ $change -eq 5 ] ; then
-	config_dir=config/bs_die
-fi
-
+prefix=(wl_die block_size_config 3_factor el_die bs_die)
+config_dir="config/${prefix["$change"-1]}"
+exec_dir="exec/${prefix["$change"-1]}"
+out_dir="out/${prefix["$change"-1]}"
 
 
 if [ $change -eq 1 ]; then

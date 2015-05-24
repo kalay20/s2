@@ -40,7 +40,7 @@ if [ "$change" -eq 1 ]; then
 		do
 			for (( j="$dn_start"; j<"$dn_end"; j++ ))
 			do
-				make -f c config_file="$config_dir"/ssd_typedef_${wl["$i"]}_${dn["$j"]}.h
+				make -f make_script config_file="$config_dir"/ssd_typedef_${wl["$i"]}_${dn["$j"]}.h
 				echo "cp ./run.x ./"$exec_dir"/run_${wl["$i"]}_${dn["$j"]}.x"
 				cp ./run.x ./"$exec_dir"/run_${wl["$i"]}_${dn["$j"]}.x
 			done
@@ -68,7 +68,7 @@ elif [ "$change" -eq 2 ] ; then
 				done
 			fi
 
-			make -f c config_file="$config_dir"/ssd_typedef_${bs["$i"]}.h
+			make -f make_script config_file="$config_dir"/ssd_typedef_${bs["$i"]}.h
 			./run.x ${workload["$wn"]} 0 20 > out/"$prefix"/${workload_short["$wn"]}_${bs["$i"]} 2> out/"$prefix"/stderr/${workload_short["$wn"]}_${bs["$i"]} &
 			
 			if [ $if_test -eq 0 ]
@@ -103,7 +103,7 @@ elif [ $change -eq 3 ] ; then
 						done
 					fi
 
-					make -f c config_file="$config_dir"/ssd_typedef_${el["$i"]}_${wl["$j"]}_${bs["$k"]}.h
+					make -f make_script config_file="$config_dir"/ssd_typedef_${el["$i"]}_${wl["$j"]}_${bs["$k"]}.h
 					./run.x ${workload["$wn"]} 0 20 > out/"$prefix"/${workload_short["$wn"]}_${el["$i"]}_${wl["$j"]}_${bs["$k"]} 2> out/"$prefix"/stderr/${workload_short["$wn"]}_${el["$i"]}_${wl["$j"]}_${bs["$k"]} &
 
 					if [ $if_test -eq 0 ]
@@ -138,7 +138,7 @@ elif [ $change -eq 4 ] ; then
 					done
 				fi
 
-				make -f c config_file="$config_dir"/ssd_typedef_${el["$i"]}_${dn["$j"]}.h
+				make -f make_script config_file="$config_dir"/ssd_typedef_${el["$i"]}_${dn["$j"]}.h
 				echo "cp ./run.x ./"$exec_dir"/run_${el["$i"]}_${dn["$j"]}.x"
 				cp ./run.x ./"$exec_dir"/run_${el["$i"]}_${dn["$j"]}.x
 
@@ -173,7 +173,7 @@ elif [ $change -eq 5 ] ; then
 					done
 				fi
 				
-				make -f c config_file="$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
+				make -f make_script config_file="$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
 				echo "cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x"
 				cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x
 

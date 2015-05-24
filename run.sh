@@ -17,10 +17,17 @@ if_test=${if_test:-0}
 
 wd_start=${wd_start:-0}
 wd_end=${wd_end:-6}
-#workload=(/home/r01/gengyouchen/ssd_trace/ms_exchange_server.trace /home/r01/gengyouchen/ssd_trace/msn_fs.trace /home/r01/gengyouchen/ssd_trace/ms_live_maps.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/usr_1.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/src1_0.trace /home/r01/gengyouchen/ssd_trace/synthetic_overload_full.trace)
-workload=(/home/r03/sin19682004/test/simulator2/trace/mse_burst.trace /home/r03/sin19682004/test/simulator2/trace/msn_burst.trace /home/r03/sin19682004/test/simulator2/trace/synf_burst.trace /home/r01/gengyouchen/ssd_trace/ms_live_maps.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/usr_1.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/src1_0.trace)
-#workload_short=(mse msn msl usr1 src10 synf_b)
-workload_short=(mse_b msn_b synf_b msl usr1 src10)
+workload_burst=( mse_b msn_b msl_b usr1_b src10_b synf_b )
+workload_dst=( mse msn msl usr1 src10 synf )
+workload_dir=trace
+workload=()
+
+for (( wn="$wd_start"; wn<"$wd_end"; wn++ ))
+do
+	workload["$wn"]="$workload_dir"/"${workload_burst["$wn"]}"
+done
+
+workload_short=(mse_b msn_b msl usr1 src10 synf_b)
 
 
 el=( 100 150 200 250 300 )
