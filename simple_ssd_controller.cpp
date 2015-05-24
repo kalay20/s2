@@ -245,8 +245,11 @@ void simple_ssd_controller::debug_check_all_req_completed() const {
 	cout << "\t\t# of User SLC Page Write: " << total_number_of_io_slc_page_write << " (" << static_cast<long double>(total_number_of_io_slc_page_write) * 100 / total_number_of_io_page_write << "%)" << endl;
 	cout << "\t\t# of User MLC Page Write: " << total_number_of_io_mlc_page_write << " (" << static_cast<long double>(total_number_of_io_mlc_page_write) * 100 / total_number_of_io_page_write << "%)" << endl;
 	cout << "\t# of GC Page Read: " << total_number_of_gc_page_read << endl;
+        cout << "\t\t# of Foreground: " << total_number_of_gc_page_read_f << ",\t\t# of Background: " << total_number_of_gc_page_read_b << endl;
 	cout << "\t# of GC Page Write: " << total_number_of_gc_page_write << endl;
+        cout << "\t\t# of Foreground: " << total_number_of_gc_page_write_f << ",\t\t# of Background: " << total_number_of_gc_page_write_b << endl;
 	cout << "\t# of GC Block Erase: " << total_number_of_gc_block_erase << endl;
+        cout << "\t\t# of Foreground: " << total_number_of_gc_page_erase_f << ",\t\t# of Background: " << total_number_of_gc_page_erase_b << endl;
 	cout << "\t\t# of GC SLC Block Erase: " << total_number_of_gc_slc_block_erase << " (" << static_cast<long double>(total_number_of_gc_slc_block_erase) * 100 / total_number_of_gc_block_erase << "%)" << endl;
 	cout << "\t\t# of GC MLC Block Erase: " << total_number_of_gc_mlc_block_erase << " (" << static_cast<long double>(total_number_of_gc_mlc_block_erase) * 100 / total_number_of_gc_block_erase << "%)" << endl;
 
