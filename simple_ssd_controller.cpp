@@ -179,6 +179,18 @@ void simple_ssd_controller::debug_check_all_req_completed() const {
 	pbn_t total_number_of_gc_mlc_block_erase = 0;
 
 	pbn_t total_number_of_physical_blocks = 0;
+	
+	// LaiYang
+	size_t total_number_of_gc=0;
+	int total_number_live_copy_gc=0;
+
+	ppn_t total_number_of_gc_page_read_f = 0;
+	ppn_t total_number_of_gc_page_read_b = 0;
+	ppn_t total_number_of_gc_page_erase_f = 0;
+	ppn_t total_number_of_gc_page_erase_b = 0;
+	ppn_t total_number_of_gc_page_write_f = 0;
+	ppn_t total_number_of_gc_page_write_b = 0;
+	// end LaiYang
 
 	for (int die_idx = 0; die_idx < die_schedulers.size(); die_idx++) {
 
@@ -208,7 +220,24 @@ void simple_ssd_controller::debug_check_all_req_completed() const {
 		total_number_of_gc_mlc_block_erase += die_schedulers[die_idx]->number_of_gc_mlc_block_erase;
 
 		total_number_of_physical_blocks += BLOCK_PER_DIE;
+                // LaiYang
+                total_number_of_gc += die_ftls->number_of_gc_trigger[die_idx];
+                for( int i=0; i< die_ftls->number_of_gc_trigger[die_idx]; i++ ){
+                        total_number_live_copy_gc += die_ftls->live_page_copy_per_gc[die_idx][i];
+                }
+                total_number_of_gc_page_read_f += die_schedulers[die_idx]->number_of_gc_page_read_f;
+                total_number_of_gc_page_read_b += die_schedulers[die_idx]->number_of_gc_page_read_b;
+                total_number_of_gc_page_write_f += die_schedulers[die_idx]->number_of_gc_page_write_f;
+                total_number_of_gc_page_write_b += die_schedulers[die_idx]->number_of_gc_page_write_b;
+                total_number_of_gc_page_erase_f += die_schedulers[die_idx]->number_of_gc_page_erase_f;
+                total_number_of_gc_page_erase_b += die_schedulers[die_idx]->number_of_gc_page_erase_b;
+                // end LaiYang
+
 	}
+        // LaiYang
+        cout << " total gc: " << total_number_of_gc << endl;
+        cout << " avg live page copy per gc: " << (double)total_number_live_copy_gc / (double)total_number_of_gc << endl;
+        // end LaiYang
 
 	cout << "For entire SSD:" << endl;
 	cout << "\t# of User Page Read: " << total_number_of_io_page_read << endl;
@@ -216,8 +245,11 @@ void simple_ssd_controller::debug_check_all_req_completed() const {
 	cout << "\t\t# of User SLC Page Write: " << total_number_of_io_slc_page_write << " (" << static_cast<long double>(total_number_of_io_slc_page_write) * 100 / total_number_of_io_page_write << "%)" << endl;
 	cout << "\t\t# of User MLC Page Write: " << total_number_of_io_mlc_page_write << " (" << static_cast<long double>(total_number_of_io_mlc_page_write) * 100 / total_number_of_io_page_write << "%)" << endl;
 	cout << "\t# of GC Page Read: " << total_number_of_gc_page_read << endl;
+        cout << "\t\t# of Foreground: " << total_number_of_gc_page_read_f << ",\t\t# of Background: " << total_number_of_gc_page_read_b << endl;
 	cout << "\t# of GC Page Write: " << total_number_of_gc_page_write << endl;
+        cout << "\t\t# of Foreground: " << total_number_of_gc_page_write_f << ",\t\t# of Background: " << total_number_of_gc_page_write_b << endl;
 	cout << "\t# of GC Block Erase: " << total_number_of_gc_block_erase << endl;
+        cout << "\t\t# of Foreground: " << total_number_of_gc_page_erase_f << ",\t\t# of Background: " << total_number_of_gc_page_erase_b << endl;
 	cout << "\t\t# of GC SLC Block Erase: " << total_number_of_gc_slc_block_erase << " (" << static_cast<long double>(total_number_of_gc_slc_block_erase) * 100 / total_number_of_gc_block_erase << "%)" << endl;
 	cout << "\t\t# of GC MLC Block Erase: " << total_number_of_gc_mlc_block_erase << " (" << static_cast<long double>(total_number_of_gc_mlc_block_erase) * 100 / total_number_of_gc_block_erase << "%)" << endl;
 

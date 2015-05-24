@@ -589,13 +589,23 @@ void simple_die_ftl::schedule_gc_if_needed(int die_idx) {
 
 	mark_as_tail_pb(p_meta_table[die_idx], victim_old_physical_block);
 
+    // LaiYang
+    int live_page_copy_cnt=0;
+    // end LaiYang
 
 	FOR_EACH_PP_IN_PB(p_meta_table[die_idx], victim_old_physical_block, ppn, pp_meta) {
 		if (pp_meta->state == PP_LIVE) {
+                        // LaiYang
+                        live_page_copy_cnt++;
+                        // end LaiYang
 			assert(pp_meta->ptr_to_logical_page != NULL_LPN);
 			ftl_callback[die_idx]->schedule_gc_page_copy(ppn, pp_meta->ptr_to_logical_page);
 		}
 	} END_FOR_EACH_PP_IN_PB;
+        // LaiYang
+        live_page_copy_per_gc[die_idx].push_back( live_page_copy_cnt );
+        number_of_gc_trigger[die_idx]++;
+        // end LaiYang
 
 	switch (p_meta_table[die_idx]->pb_meta_array[victim_old_physical_block].mode) {
 		case PB_SLC:
@@ -628,6 +638,13 @@ msec_t simple_die_ftl::_determine_write_latency(const wr_ptr_t *wr_ptr) const {
 }
 
 simple_die_ftl::simple_die_ftl(sc_module_name module_name, int number_of_dice) : sc_module(module_name) {
+        // LaiYang
+        live_page_copy_per_gc = new std::deque<int> [number_of_dice];
+        number_of_gc_trigger = new int [number_of_dice];
+        for(int i=0; i<number_of_dice; i++){
+                number_of_gc_trigger[i] = 0;
+        }
+        // end LaiYang
 	m_number_of_dice = number_of_dice;
 	ftl_callback.resize(m_number_of_dice, NULL);
 	wr_ptr_for_short_io_queue.resize(m_number_of_dice, NULL);

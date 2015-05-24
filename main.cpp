@@ -4,6 +4,11 @@
 #include <string>
 #include <algorithm>
 
+// LaiYang
+#include <pthread.h>
+#include <semaphore.h>
+// end LaiYang
+
 #include "systemc.h"
 #include "gyc_bus.h"
 
@@ -87,7 +92,13 @@ int sc_main(int argc, char* argv[]) {
 	upload_bus.dev(ssd);
 
 	if(last == 0) ssd.load_last_use(trace_path, number_of_dice);
+
 	sc_start();
+	
+	// LaiYang
+    cout << "Total execution time: " << sc_time_stamp() << endl;
+    // end LaiYang
+
 	ssd.debug_check_all_req_completed();
 	host.print_score();
 	
