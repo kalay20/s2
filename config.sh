@@ -9,7 +9,8 @@ dn_start=${dn_start:-0}
 dn_end=${dn_end:-5}
 bs_start=${bs_start:-0}
 bs_end=${bs_end:-4}
-
+ch_start=${ch_start:-0}
+ch_end=${ch_end:-5}
 
 
 config_origin=ssd_typedef_normal.h
@@ -19,10 +20,11 @@ el=( 100 150 200 250 300 )
 wl=( 100 150 200 250 300 )
 dn=( 64 80 96 112 128 )
 bs=( 128 256 512 1024 )
+ch=( 1 2 4 8 16 )
 
 change=${change:-1}
 
-prefix=(wl_die block_size_config 3_factor el_die bs_die)
+prefix=(wl_die block_size_config 3_factor el_die bs_die ch_die )
 config_dir="config/${prefix["$change"-1]}"
 exec_dir="exec/${prefix["$change"-1]}"
 out_dir="out/${prefix["$change"-1]}"
@@ -89,8 +91,16 @@ elif [ $change -eq 5 ] ; then
 			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*128*64/${bs[$i]}/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
 		done
 	done
-
-
+elif [ $change -eq 6 ] ; then
+	for (( i="$ch_start"; i<"$ch_end"; i++ ))
+	do
+		for (( j="$dn_start"; j<"$dn_end"; j++ ))
+		do
+			cp "$config_origin" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
+			sed -i -e "s/SSD_CHANNEL_NUMBER 8/SSD_CHANNEL_NUMBER ${ch[$i]}/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
+			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
+		done
+	done
 fi
 
 
