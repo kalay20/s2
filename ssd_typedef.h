@@ -7,6 +7,8 @@
 #define BYTE_PER_ADDRESS 5
 #define BYTE_PER_STATUS 1
 
+#define CLOCK_DRIVEN_DEBUG 1
+
 /* Assume each die is a typical 8GB MLC die using 8KB as their page size */
 /*     and we use its clustered page size to support multi-plane command */
 #define PLANE_PER_DIE 2

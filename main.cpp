@@ -92,7 +92,7 @@ int sc_main(int argc, char* argv[]) {
 	host.print_score();
 	
 	//if(last == 0)ssd.save_last_use(trace_path+"c", last, number_of_dice);
-	//if(last == -1)ssd.save_last_use(trace_path+"f", last, number_of_dice);
+	//if(last == -1)ssd.save_last_use(trace_path+"f2", last, number_of_dice);
 	/* check memory leakage */
 	/* if there're any memory leakage, then your code may have other bugs (e.g. un-finished request) */
 	assert(global_mm->count() == 0);

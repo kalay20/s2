@@ -187,6 +187,11 @@ msec_t simple_die_ftl::issue_page_read(lpn_t logical_page, bool generated_by_gc,
 	assert(logical_page < USER_CAPACITY_IN_PAGE_PER_DIE * m_number_of_dice);
 
 	schedule_gc_if_needed(die_idx);
+#ifdef CLOCK_DRIVEN_DEBUG
+	printf("read  : ");
+	sc_time_stamp().print();
+	printf(" die:%2d lpn:%lld\n", die_idx, logical_page);
+#endif
 	return MLC_READ_LATENCY;
 }
 
@@ -264,6 +269,11 @@ msec_t simple_die_ftl::issue_page_write(lpn_t logical_page, bool generated_by_gc
 	lp_meta_table[logical_page].die_idx = die_idx;
 
 	schedule_gc_if_needed(die_idx);
+#ifdef CLOCK_DRIVEN_DEBUG
+	printf("write : ");
+	sc_time_stamp().print();
+	printf(" die:%2d old_pp:%lld lpn:%lld new_pp:%lld\n", die_idx, old_physical_page, logical_page, new_pp);
+#endif
 	return program_latency;
 }
 
