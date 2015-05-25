@@ -57,7 +57,7 @@ elif [ $change -eq 5 ] ; then
 			do
 				make -f make_script config_file="$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
 				echo "cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x"
-				cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.
+				cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x
 			done
 		done
 elif [ $change -eq 6 ] ; then
@@ -67,7 +67,7 @@ elif [ $change -eq 6 ] ; then
 		do
 			make -f make_script config_file="$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
 			echo "cp ./run.x ./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.x"
-			cp ./run.x ./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.
+			cp ./run.x ./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.x
 		done
 	done
 fi
