@@ -65,13 +65,9 @@ elif [ $change -eq 6 ] ; then
 	do
 		for (( j="$dn_start"; j<"$dn_end"; j++ ))
 		do
-			make -f make_script config_file="$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
-			echo "cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x"
-			cp ./run.x ./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.
-			
-			cp "$config_origin" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
-			sed -i -e "s/SSD_CHANNEL_NUMBER 8/SSD_CHANNEL_NUMBER ${ch[$i]}/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
-			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
+			make -f make_script config_file="$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
+			echo "cp ./run.x ./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.x"
+			cp ./run.x ./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.
 		done
 	done
 fi

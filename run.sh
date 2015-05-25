@@ -8,6 +8,8 @@ dn_start=${dn_start:-0}
 dn_end=${dn_end:-5}
 bs_start=${bs_start:-0}
 bs_end=${bs_end:-4}
+ch_start=${ch_start:-0}
+ch_end=${ch_end:-5}
 
 job_max=${job_max:-0}
 cpu_max=${cpu_max:-0}
@@ -39,7 +41,7 @@ change=${change:-1}
 # 1=die number
 # 2=block size
 
-prefix=(wl_die block_size_config 3_factor el_die bs_die)
+prefix=(wl_die block_size_config 3_factor el_die bs_die ch_die )
 config_dir="config/${prefix["$change"-1]}"
 exec_dir="exec/${prefix["$change"-1]}"
 out_dir="out/${prefix["$change"-1]}"
@@ -231,6 +233,45 @@ elif [ $change -eq 5 ] ; then
 				
 				echo "./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x ${workload["$wn"]} 0 ${dn["$j"]} > "$out_dir"/${workload_short["$wn"]}_${bs["$i"]}_${dn["$j"]} 2> "$out_dir"/stderr/${workload_short["$wn"]}_${bs["$i"]}_${dn["$j"]} &"
 				./"$exec_dir"/run_${bs["$i"]}_${dn["$j"]}.x ${workload["$wn"]} 0 ${dn["$j"]} > "$out_dir"/${workload_short["$wn"]}_${bs["$i"]}_${dn["$j"]} 2> "$out_dir"/stderr/${workload_short["$wn"]}_${bs["$i"]}_${dn["$j"]} &
+
+				if [ $if_test -eq 0 ]
+				then
+					sleep "$delay"
+				fi
+			done
+		done
+	done
+elif [ $change -eq 6 ] ; then
+	for (( wn="$wd_start"; wn<"$wd_end"; wn++ ))
+	do
+		for (( i="$ch_start"; i<"$ch_end"; i++ ))
+		do
+			for (( j="$dn_start"; j<"$dn_end"; j++ ))
+			do
+				if [ $if_test -eq 1 ]
+				then
+					sleep "$delay_small"
+					bash ./cpu.sh "$cpu_max" "$if_test"
+					#echo "$?"
+					while [ $? -eq 255 ]
+					do
+						sleep "$delay"
+						bash ./cpu.sh "$cpu_max" "$if_test"
+					done
+				elif [ $if_test -eq 2 ]
+				then
+					sleep "$delay_small"
+					bash ./cpu.sh "$job_max" "$if_test"
+					#echo "$?"
+					while [ $? -eq 255 ]
+					do
+						sleep "$delay"
+						bash ./cpu.sh "$job_max" "$if_test"
+					done
+				fi
+				
+				echo "./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.x ${workload["$wn"]} 0 ${dn["$j"]} > "$out_dir"/${workload_short["$wn"]}_${ch["$i"]}_${dn["$j"]} 2> "$out_dir"/stderr/${workload_short["$wn"]}_${ch["$i"]}_${dn["$j"]} &"
+				./"$exec_dir"/run_${ch["$i"]}_${dn["$j"]}.x ${workload["$wn"]} 0 ${dn["$j"]} > "$out_dir"/${workload_short["$wn"]}_${ch["$i"]}_${dn["$j"]} 2> "$out_dir"/stderr/${workload_short["$wn"]}_${ch["$i"]}_${dn["$j"]} &
 
 				if [ $if_test -eq 0 ]
 				then
