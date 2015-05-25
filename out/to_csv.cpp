@@ -9,14 +9,16 @@ const int el_end=5;
 const int wl_end=5;
 const int dn_end=5;
 const int bs_end=4;
+const int ch_end=5;
 
 //int wl[7] = {1,2,4,8,16,32,64};
 //int dn[6] = {20,40,80,160,320,640};
 
-int el[el_end]={ 100, 150, 200, 250, 300 };
-int	wl[wl_end]={ 100, 150, 200, 250, 300 };
-int	dn[dn_end]={ 64, 80, 96, 112, 128 };
-int	bs[bs_end]={ 128, 256, 512, 1024 };
+int el[]={ 100, 150, 200, 250, 300 };
+int	wl[]={ 100, 150, 200, 250, 300 };
+int	dn[]={ 64, 80, 96, 112, 128 };
+int	bs[]={ 128, 256, 512, 1024 };
+int ch[]={ 1, 2, 4, 8, 16 };
 
 
 

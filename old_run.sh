@@ -17,29 +17,19 @@ delay=${delay:-0}
 delay_small=${delay_small:-0}
 if_test=${if_test:-0}
 
-wd_burst=${wd_burst:-1}
 wd_start=${wd_start:-0}
 wd_end=${wd_end:-6}
-workload_prefix=( mse msn msl usr1 src10 synf )
-workload_burst_suffix=burst
-workload_origin_path=( /home/r01/gengyouchen/ssd_trace/ms_exchange_server.trace /home/r01/gengyouchen/ssd_trace/msn_fs.trace /home/r01/gengyouchen/ssd_trace/ms_live_maps.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/usr_1.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/src1_0.trace /home/r01/gengyouchen/ssd_trace/synthetic_overload_full.trace )
-workload_burst_path_prefix=/home/r03/sin19682004/test/simulator2/trace
+workload_burst=( mse_b msn_b msl_b usr1_b src10_b synf_b )
+workload_dst=( mse msn msl usr1 src10 synf )
+workload_dir=trace
 workload=()
-workload_short=()
 
 for (( wn="$wd_start"; wn<"$wd_end"; wn++ ))
 do
-	if [ "$wd_burst" -eq 0 ]
-	then
-		workload["$wn"]="${workload_origin_path["$wn"]}"
-		workload_short["$wn"]="${workload_prefix["$wn"]}"
-	elif [ "$wd_burst" -eq 1 ]
-	then
-		workload["$wn"]="$workload_burst_path_prefix"/"${workload_prefix["$wn"]}"_"$workload_burst_suffix".trace
-		workload_short["$wn"]="${workload_prefix["$wn"]}"_b
-	fi
+	workload["$wn"]="$workload_dir"/"${workload_burst["$wn"]}"
 done
 
+workload_short=(mse_b msn_b msl_b usr1_b src10_b synf_b)
 
 
 el=( 100 150 200 250 300 )
