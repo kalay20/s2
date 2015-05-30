@@ -31,7 +31,8 @@ void simple_die_ftl::reset_data_layout() {
 		wr_ptr_for_gc[i] = create_wr_ptr(p_meta_table[i], MLC_MODE);
 	}
 #ifdef ADD_DUMMY_TO_INITIAL_LAYOUT
-	const pbn_t num_of_head_pb_caused_by_wr_ptr = 3; /* i.e. (1) wr_ptr_for_gc, (2) wr_ptr_for_short_io_queue, (3) wr_ptr_for_long_io_queue */
+	const pbn_t num_of_head_pb_caused_by_wr_ptr = 3; 
+	/* i.e. (1) wr_ptr_for_gc, (2) wr_ptr_for_short_io_queue, (3) wr_ptr_for_long_io_queue */
 	const pbn_t num_of_pb_to_be_filled = BLOCK_PER_DIE * (100 - min_free_blocks_percentage) / 100 - num_of_head_pb_caused_by_wr_ptr;
 	const ppn_t num_of_pp_to_be_filled = num_of_pb_to_be_filled * PAGE_PER_BLOCK;
 	const ppn_t num_of_live_pp_to_be_filled = USER_CAPACITY_IN_PAGE_PER_DIE;
@@ -42,51 +43,64 @@ void simple_die_ftl::reset_data_layout() {
 	vector<ppn_t> num_of_live_pp_has_been_filled(m_number_of_dice, 0) ;
 	vector<ppn_t> num_of_dead_pp_has_been_filled(m_number_of_dice, 0) ;
 	
-	int die = 0;
+	int die = 0, sum=0;
 	lpn_t lpn = 0;
-	std::vector<int> die_unused;
-	die_unused.resize(m_number_of_dice, USER_CAPACITY_IN_PAGE_PER_DIE);
-	while (lpn < m_number_of_dice * USER_CAPACITY_IN_PAGE_PER_DIE){
-		while(1){
-			die = rand() % m_number_of_dice;
-			if(die_unused[die] != 0) break;
-		}
+	std::vector<int> die_finish;
+	die_finish.resize(m_number_of_dice, 0);
+
+	while (1){
+		sum=0;
+		for(int i=0; i < m_number_of_dice; i++)sum = sum + die_finish[i];
+		if (sum > m_number_of_dice-2) cout << sum <<" ";
+		if(sum == m_number_of_dice) break;
+
+		die = rand() % m_number_of_dice;
+		if(die_finish[die] == 1)continue;
 
 		assert(num_of_pp_to_be_filled - num_of_pp_has_been_filled[die] >= 0);
 		assert(num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die] >= 0);
 		assert(num_of_dead_pp_to_be_filled - num_of_dead_pp_has_been_filled[die] >= 0);
 
-		/*if (num_of_pp_to_be_filled - num_of_pp_has_been_filled[die] == 0) {
+		if (num_of_pp_to_be_filled - num_of_pp_has_been_filled[die] == 0) {//all page is OK
 			assert(num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die] == 0);
 			assert(num_of_dead_pp_to_be_filled - num_of_dead_pp_has_been_filled[die] == 0);
-		} else if (num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die] == 0) {
+			die_finish[die] = 1;
+			cout << sum << " check" << endl;
+		} 
+		else if (num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die] == 0) {//live page is OK
 			assert(num_of_pp_to_be_filled - num_of_pp_has_been_filled[die] == num_of_dead_pp_to_be_filled - num_of_dead_pp_has_been_filled[die]);
 			write_dummy_to_wr_ptr(p_meta_table[die], wr_ptr_for_gc[die]);
 			num_of_dead_pp_has_been_filled[die]++;
 			num_of_pp_has_been_filled[die]++;
-		} else */if (num_of_dead_pp_to_be_filled - num_of_dead_pp_has_been_filled[die] == 0) {
+		}
+		else if (num_of_dead_pp_to_be_filled - num_of_dead_pp_has_been_filled[die] == 0) {//dead page is OK
 			assert(num_of_pp_to_be_filled - num_of_pp_has_been_filled[die] == num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die]);
 			lp_meta_table[lpn].ptr_to_physical_page = write_lp_to_wr_ptr(p_meta_table[die], wr_ptr_for_gc[die], lpn);
-			lp_meta_table[lpn].die_idx = die;
-			lpn++;die_unused[die]--;
 			num_of_live_pp_has_been_filled[die]++;
 			num_of_pp_has_been_filled[die]++;
-		} else {
+
+			lp_meta_table[lpn].die_idx = die;
+			lpn++;
+		}
+		else {
 			assert((num_of_pp_to_be_filled - num_of_pp_has_been_filled[die]) == (num_of_dead_pp_to_be_filled - num_of_dead_pp_has_been_filled[die]) + (num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die]));
 			if (rand() % num_of_pp_to_be_filled < num_of_dead_pp_to_be_filled) {
 				write_dummy_to_wr_ptr(p_meta_table[die], wr_ptr_for_gc[die]);
 				num_of_dead_pp_has_been_filled[die]++;
 				num_of_pp_has_been_filled[die]++;
-			} else {
+			} 
+			else {
 				lp_meta_table[lpn].ptr_to_physical_page = write_lp_to_wr_ptr(p_meta_table[die], wr_ptr_for_gc[die], lpn);
-				lp_meta_table[lpn].die_idx = die;
-				lpn++;die_unused[die]--;
 				num_of_live_pp_has_been_filled[die]++;
 				num_of_pp_has_been_filled[die]++;
+
+				lp_meta_table[lpn].die_idx = die;
+				lpn++;
 			}
 		}
 	}
-	for (int die=0; die < m_number_of_dice; die++){
+
+	/*for (int die=0; die < m_number_of_dice; die++){
 		while(1){
 			if (num_of_pp_to_be_filled - num_of_pp_has_been_filled[die] == 0) {
 				assert(num_of_live_pp_to_be_filled - num_of_live_pp_has_been_filled[die] == 0);
@@ -99,11 +113,9 @@ void simple_die_ftl::reset_data_layout() {
 				num_of_pp_has_been_filled[die]++;
 			}
 		}
-	}
-	cout <<"end" <<endl;
+	}*/
 #else
 	/* simply write all initial data sequentially via wr_ptr_for_gc */
-
 	int die = 0;
 	std::vector<int> die_unused;
 	die_unused.resize(m_number_of_dice, USER_CAPACITY_IN_PAGE_PER_DIE);
@@ -120,20 +132,7 @@ void simple_die_ftl::reset_data_layout() {
 		lp_meta_table[lpn].ptr_to_physical_page = new_pp;
 		lp_meta_table[lpn].die_idx = die;
 	}
-	
-	/*ppn_t tmp_lpn = 0;
-	for (int i=0; i < m_number_of_dice; i++){
-		for (lpn_t lpn = 0; lpn < USER_CAPACITY_IN_PAGE_PER_DIE; lpn++) {
-			tmp_lpn = i * USER_CAPACITY_IN_PAGE_PER_DIE + lpn;
-
-			ppn_t new_pp = write_lp_to_wr_ptr(p_meta_table[i], wr_ptr_for_gc[i], tmp_lpn);
-			lp_meta_table[tmp_lpn].ptr_to_physical_page = new_pp;
-			lp_meta_table[tmp_lpn].die_idx = i;
-			//assert(tmp_lpn == new_pp + i * USER_CAPACITY_IN_PAGE_PER_DIE);
-		}
-	}*/
 #endif
-
 
 	for (int i=0; i < m_number_of_dice; i++){
 		switch (slc_policy) {
@@ -161,8 +160,8 @@ void simple_die_ftl::reset_data_layout() {
 
 #ifdef ADD_DUMMY_TO_INITIAL_LAYOUT
 	for (int i=0; i < m_number_of_dice; i++){
-		assert(p_meta_table[i]->num_of_free_pbs * 100 > p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage);
-		assert((p_meta_table[i]->num_of_free_pbs - 1) * 100 <= p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage);
+		assert(p_meta_table[i]->num_of_free_pbs * 100 > p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage); //free not enough
+		assert((p_meta_table[i]->num_of_free_pbs - 1) * 100 <= p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage);//too many free
 	}
 #endif
 	cout << "End of FTL init" << endl;
@@ -589,23 +588,13 @@ void simple_die_ftl::schedule_gc_if_needed(int die_idx) {
 
 	mark_as_tail_pb(p_meta_table[die_idx], victim_old_physical_block);
 
-    // LaiYang
-    int live_page_copy_cnt=0;
-    // end LaiYang
 
 	FOR_EACH_PP_IN_PB(p_meta_table[die_idx], victim_old_physical_block, ppn, pp_meta) {
 		if (pp_meta->state == PP_LIVE) {
-                        // LaiYang
-                        live_page_copy_cnt++;
-                        // end LaiYang
 			assert(pp_meta->ptr_to_logical_page != NULL_LPN);
 			ftl_callback[die_idx]->schedule_gc_page_copy(ppn, pp_meta->ptr_to_logical_page);
 		}
 	} END_FOR_EACH_PP_IN_PB;
-        // LaiYang
-        live_page_copy_per_gc[die_idx].push_back( live_page_copy_cnt );
-        number_of_gc_trigger[die_idx]++;
-        // end LaiYang
 
 	switch (p_meta_table[die_idx]->pb_meta_array[victim_old_physical_block].mode) {
 		case PB_SLC:
@@ -638,13 +627,6 @@ msec_t simple_die_ftl::_determine_write_latency(const wr_ptr_t *wr_ptr) const {
 }
 
 simple_die_ftl::simple_die_ftl(sc_module_name module_name, int number_of_dice) : sc_module(module_name) {
-        // LaiYang
-        live_page_copy_per_gc = new std::deque<int> [number_of_dice];
-        number_of_gc_trigger = new int [number_of_dice];
-        for(int i=0; i<number_of_dice; i++){
-                number_of_gc_trigger[i] = 0;
-        }
-        // end LaiYang
 	m_number_of_dice = number_of_dice;
 	ftl_callback.resize(m_number_of_dice, NULL);
 	wr_ptr_for_short_io_queue.resize(m_number_of_dice, NULL);
