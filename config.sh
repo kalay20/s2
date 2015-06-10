@@ -38,7 +38,7 @@ if [ $change -eq 1 ]; then
 		do
 			R=$(awk "BEGIN {printf \"%.2f\",0.6*${wl[$i]}/100}")
 			cp "$config_origin" "$config_dir"/ssd_typedef_${wl["$i"]}_${dn["$j"]}.h
-			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${wl["$i"]}_${dn["$j"]}.h
+			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE (1+$((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${wl["$i"]}_${dn["$j"]}.h
 			sed -i -e "s/MLC_PROGRAM_LATENCY ((msec_t) 0.600)/MLC_PROGRAM_LATENCY ((msec_t) $R)/g" "$config_dir"/ssd_typedef_${wl["$i"]}_${dn["$j"]}.h
 			#./run.x "$workload" 0 ${dn["$j"]} > out/"$workload_short"_${wl["$i"]}_${dn["$j"]} 2> out/stderr/"$workload_short"_${wl["$i"]}_${dn["$j"]} &
 		done
@@ -77,7 +77,7 @@ elif [ $change -eq 4 ] ; then
 		do
 			R2=$(awk "BEGIN {printf \"%.2f\",3.0*${el[$i]}/100}")
 			cp "$config_origin" "$config_dir"/ssd_typedef_${el["$i"]}_${dn["$j"]}.h
-			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${el["$i"]}_${dn["$j"]}.h
+			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE (1+$((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${el["$i"]}_${dn["$j"]}.h
 			sed -i -e "s/MLC_ERASE_LATENCY ((msec_t) 3.000)/MLC_ERASE_LATENCY ((msec_t) $R2)/g" "$config_dir"/ssd_typedef_${el["$i"]}_${dn["$j"]}.h
 		done
 	done
@@ -88,7 +88,7 @@ elif [ $change -eq 5 ] ; then
 		do
 			cp "$config_origin" "$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
 			sed -i -e "s/PAGE_PER_BLOCK 128/PAGE_PER_BLOCK ${bs[$i]}/g" "$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
-			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*128*64/${bs[$i]}/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
+			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE (1+$((8192*128*64/${bs[$i]}/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${bs["$i"]}_${dn["$j"]}.h
 		done
 	done
 elif [ $change -eq 6 ] ; then
@@ -98,7 +98,7 @@ elif [ $change -eq 6 ] ; then
 		do
 			cp "$config_origin" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
 			sed -i -e "s/SSD_CHANNEL_NUMBER 8/SSD_CHANNEL_NUMBER ${ch[$i]}/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
-			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE ($((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
+			sed -i -e "s/BLOCK_PER_DIE (8192 \/ PLANE_PER_DIE)/BLOCK_PER_DIE (1+$((8192*64/${dn[$j]})) \/ PLANE_PER_DIE)/g" "$config_dir"/ssd_typedef_${ch["$i"]}_${dn["$j"]}.h
 		done
 	done
 fi
