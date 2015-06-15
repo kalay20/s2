@@ -20,7 +20,9 @@ int	bs[bs_end]={ 128, 256, 512, 1024 };
 
 
 
-char workload_short[] = "mse_b";
+int workload_size = 6;
+char workload_short[][10] = {"mse","msn","msl","usr1","src10","synf"};
+int workload_bool[] = {1,1,1,1,1,1};
 
 void H_error( const char* _Msgstderr )
 {
@@ -65,86 +67,90 @@ int main( int argc, char* argv[] )
 	if( ofp==NULL ) H_error("ofp open fail");
 
 	
-	for( i=0; i<bs_end; i++ ){
-		for(  j=0; j<dn_end; j++ ){
-			char fn[100];
-			double gc_cnt,wa,perc,live_per_gc;
-			int ret=0;
+	for( int wd=0; wd<workload_size; wd++ ){
+		if( workload_bool[wd] == 0 ) continue;
+		
+		for( i=0; i<bs_end; i++ ){
+			for(  j=0; j<dn_end; j++ ){
+				char fn[100];
+				double gc_cnt,wa,perc,live_per_gc;
+				int ret=0;
 
-			sprintf( fn, "%s_%d_%d", workload_short, bs[i], dn[j] );
-			//printf("%s\n",fn);
-			ifp = fopen(fn,"r");
-			if( ifp==NULL ) H_error(fn);
+				sprintf( fn, "%s_%d_%d", workload_short[wd], bs[i], dn[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
 
-			RF(ifp,buf);
-			fclose(ifp);
+				RF(ifp,buf);
+				fclose(ifp);
 
-			ret |= SD( buf, "GC Block Erase: ", gc_cnt );
+				ret |= SD( buf, "GC Block Erase: ", gc_cnt );
 
-			if( ret != 0 ){
-				fprintf( ofp, "%f,", 0 );
-				continue;
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", gc_cnt );
+				//printf("%s",buf);
 			}
-
-			fprintf( ofp, "%f,", gc_cnt );
-			//printf("%s",buf);
+			fprintf(ofp,"\n");
 		}
-		fprintf(ofp,"\n");
-	}
-	for( i=0; i<bs_end; i++ ){
-		for(  j=0; j<dn_end; j++ ){
-			char fn[100];
-			double gc_cnt,wa,perc,live_per_gc;
-			int ret=0;
 
-			sprintf( fn, "%s_%d_%d", workload_short, bs[i], dn[j] );
-			//printf("%s\n",fn);
-			ifp = fopen(fn,"r");
-			if( ifp==NULL ) H_error(fn);
+		for( i=0; i<bs_end; i++ ){
+			for(  j=0; j<dn_end; j++ ){
+				char fn[100];
+				double gc_cnt,wa,perc,live_per_gc;
+				int ret=0;
 
-			RF(ifp,buf);
-			fclose(ifp);
+				sprintf( fn, "%s_%d_%d", workload_short[wd], bs[i], dn[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
 
-			ret |= SD( buf, "Write Amplification: ", wa );
+				RF(ifp,buf);
+				fclose(ifp);
 
-			if( ret != 0 ){
-				fprintf( ofp, "%f,", 0 );
-				continue;
+				ret |= SD( buf, "Write Amplification: ", wa );
+
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", wa );
+				//printf("%s",buf);
 			}
-
-			fprintf( ofp, "%f,", wa );
-			//printf("%s",buf);
+			fprintf(ofp,"\n");
 		}
-		fprintf(ofp,"\n");
-	}
-	for( i=0; i<bs_end; i++ ){
-		for(  j=0; j<dn_end; j++ ){
-			char fn[100];
-			double gc_cnt,wa,perc,live_per_gc;
-			int ret=0;
+		for( i=0; i<bs_end; i++ ){
+			for(  j=0; j<dn_end; j++ ){
+				char fn[100];
+				double gc_cnt,wa,perc,live_per_gc;
+				int ret=0;
 
-			sprintf( fn, "%s_%d_%d", workload_short, bs[i], dn[j] );
-			//printf("%s\n",fn);
-			ifp = fopen(fn,"r");
-			if( ifp==NULL ) H_error(fn);
+				sprintf( fn, "%s_%d_%d", workload_short[wd], bs[i], dn[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
 
-			RF(ifp,buf);
-			fclose(ifp);
+				RF(ifp,buf);
+				fclose(ifp);
 
-			ret |= SD( buf, "avg live page copy per gc: ", live_per_gc );
+				ret |= SD( buf, "avg live page copy per gc: ", live_per_gc );
 
-			if( ret != 0 ){
-				fprintf( ofp, "%f,", 0 );
-				continue;
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", live_per_gc/bs[i] );
+				//printf("%s",buf);
 			}
-
-			fprintf( ofp, "%f,", live_per_gc/bs[i] );
-			//printf("%s",buf);
+			fprintf(ofp,"\n");
 		}
-		fprintf(ofp,"\n");
 	}
 
-	fclose(ofp);
 
 	fclose(ofp);
 	return 0;

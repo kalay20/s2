@@ -1,5 +1,5 @@
-systemc_header = $(HOME)/local/sysC-2.3.0/include
-systemc_library = $(HOME)/local/sysC-2.3.0/lib-linux64
+systemc_header = $(HOME)/local/systemc-2.3.0/include
+systemc_library = $(HOME)/local/systemc-2.3.0/lib-linux64
 
 CXXFLAGS += -I$(systemc_header)
 LDFLAGS += -L$(systemc_library) -Wl,-rpath=$(systemc_library)
