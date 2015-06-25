@@ -159,8 +159,8 @@ void simple_die_ftl::reset_data_layout() {
 
 #ifdef ADD_DUMMY_TO_INITIAL_LAYOUT
 	for (int i=0; i < m_number_of_dice; i++){
-		assert(p_meta_table[i]->num_of_free_pbs * 100 > p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage); //free not enough
-		assert((p_meta_table[i]->num_of_free_pbs - 1) * 100 <= p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage);//too many free
+		//assert(p_meta_table[i]->num_of_free_pbs * 100 > p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage); //free not enough
+		//assert((p_meta_table[i]->num_of_free_pbs - 1) * 100 <= p_meta_table[i]->num_of_all_pbs * min_free_blocks_percentage);//too many free
 	}
 #endif
 	cout << "End of FTL init" << endl;

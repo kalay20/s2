@@ -17,9 +17,9 @@ delay=${delay:-0}
 delay_small=${delay_small:-0}
 if_test=${if_test:-0}
 
-wd_burst=${wd_burst:-1}
+wd_burst=${wd_burst:-0}
 wd_start=${wd_start:-0}
-wd_end=${wd_end:-6}
+wd_end=${wd_end:-1}
 workload_prefix=( mse msn msl usr1 src10 synf )
 workload_burst_suffix=burst
 workload_origin_path=( /home/r01/gengyouchen/ssd_trace/ms_exchange_server.trace /home/r01/gengyouchen/ssd_trace/msn_fs.trace /home/r01/gengyouchen/ssd_trace/ms_live_maps.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/usr_1.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/src1_0.trace /home/r01/gengyouchen/ssd_trace/synthetic_overload_full.trace )
