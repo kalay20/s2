@@ -45,6 +45,12 @@ simple_ssd_controller::simple_ssd_controller (
 	upload_ch_port("upload_ch_port")
 {
 
+	// LaiYang
+	req_complete_cnt=0;
+	epoch_length = sc_time(10,SC_MS);
+	epoch_time_now = sc_time(0,SC_MS);
+	epoch_time_next = epoch_time_now + epoch_length;
+	// end LaiYang
 #ifdef GYC_PAPER_D_MONITOR
 	m_mlc_clean_amount = 0.0;
 	m_slc_clean_amount = 0.0;
@@ -330,6 +336,9 @@ void simple_ssd_controller::complete_parent(gyc_bus_pkt* parent_req) {
 		assert(sc_time_stamp() > parent_req->get_req_arrival_time());
 		msec_t response_time = (sc_time_stamp() - parent_req->get_req_arrival_time()).to_seconds() * 1000;
 		io_latency_monitor.record_value(response_time);
+		// LaiYang
+		add_req_complete_time(se_time(response_time,SC_MS));
+		// end LaiYang
 
 		if (io_latency_monitor.count() % 100000 == 0) {
 

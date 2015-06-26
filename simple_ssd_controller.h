@@ -23,7 +23,24 @@ class simple_ssd_controller :
 	public ssd_die_scheduler_callback,
 	public gyc_bus_dev_if
 {
+	// LaiYang
+	/*
+	public:
+		sc_time epoch_length;
+		sc_time epoch_time_now;
+		sc_time epoch_time_next;
 
+		std::deque<unsigned int> req_complete_number;
+		unsigned int req_complete_cnt;
+
+		void add_req_complete_time(sc_time t){
+			if( t >= epoch_time_next ){
+				req_complete_cnt
+			}
+			else
+		}
+	*/
+	// end LaiYang
 	private:
 		gyc_bus_pkt_mm* m_mm;
 
