@@ -337,7 +337,7 @@ void simple_ssd_controller::complete_parent(gyc_bus_pkt* parent_req) {
 		msec_t response_time = (sc_time_stamp() - parent_req->get_req_arrival_time()).to_seconds() * 1000;
 		io_latency_monitor.record_value(response_time);
 		// LaiYang
-		add_req_complete_time(se_time(response_time,SC_MS));
+		//add_req_complete_time(se_time(response_time,SC_MS));
 		// end LaiYang
 
 		if (io_latency_monitor.count() % 100000 == 0) {

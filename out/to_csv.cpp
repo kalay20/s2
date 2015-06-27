@@ -5,10 +5,15 @@
 #include <string.h>
 #include <iostream>
 
+const int el_start=5;
 const int el_end=5;
+const int wl_start=5;
 const int wl_end=5;
+const int dn_start=5;
 const int dn_end=5;
+const int bs_start=5;
 const int bs_end=4;
+const int ch_start=5;
 const int ch_end=5;
 
 //int wl[7] = {1,2,4,8,16,32,64};
@@ -22,9 +27,45 @@ int ch[]={ 1, 2, 4, 8, 16 };
 
 
 
-int workload_size = 6;
-char workload_short[][10] = {"mse","msn","msl","usr1","src10","synf"};
+const int workload_size = 6;
+char workload_short_ori[workload_size][10] = {"mse","msn","msl","usr1","src10","synf"};
+char workload_short[workload_size][10];
+
+// ---------------------- change ------------------------------------
 int workload_bool[] = {1,1,1,1,1,1};
+const int change=1;
+const int burst=0;
+
+// ---------------------- change function ------------------------------------
+int p1_end;
+int p2_end;
+int *p1, *p2;
+
+void Change_init()
+{
+	for( int i=0; i<workload_size; i++ ){
+		if( burst==0 ){
+			sprintf( workload_short[i], "%s", workload_short_ori[i] );
+		}
+		else if( burst==1 ){
+			sprintf( workload_short[i], "%s%s", workload_short_ori[i], "_b" );
+		}
+	}
+
+	if( change==1 ){
+		p1_end=wl_end; p1=wl;
+		p2_end=dn_end; p2=dn;
+	}
+	else if( change==4 ){
+		p1_end=el_end; p1=el;
+		p2_end=dn_end; p2=dn;
+	}
+	else if( change==5 ){
+		p1_end=bs_end; p1=bs;
+		p2_end=dn_end; p2=dn;
+	}
+}
+// ---------------------- end change ------------------------------------
 
 void H_error( const char* _Msgstderr )
 {
@@ -65,6 +106,8 @@ int main( int argc, char* argv[] )
 	int i,j;
 	char buf[10000];
 
+	Change_init();
+
 	ofp = fopen("out.csv","a");
 	if( ofp==NULL ) H_error("ofp open fail");
 
@@ -72,13 +115,13 @@ int main( int argc, char* argv[] )
 	for( int wd=0; wd<workload_size; wd++ ){
 		if( workload_bool[wd] == 0 ) continue;
 
-		for( i=0; i<bs_end; i++ ){
-			for(  j=0; j<dn_end; j++ ){
+		for( i=0; i<p1_end; i++ ){
+			for(  j=0; j<p2_end; j++ ){
 				char fn[100];
 				double pr,pw,t;
 				int ret=0;
 
-				sprintf( fn, "%s_%d_%d", workload_short[wd], bs[i], dn[j] );
+				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
 				//printf("%s\n",fn);
 				ifp = fopen(fn,"r");
 				if( ifp==NULL ) H_error(fn);
@@ -102,7 +145,125 @@ int main( int argc, char* argv[] )
 			}
 			fprintf(ofp,"\n");
 		}
+
+		for( i=0; i<p1_end; i++ ){
+			for(  j=0; j<p2_end; j++ ){
+				char fn[100];
+				double latency;
+				int ret=0;
+
+				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
+
+				RF(ifp,buf);
+				fclose(ifp);
+
+				ret |= SD( buf, "average I/O latency = ", latency );
+
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", latency );
+				//printf("%s",buf);
+			}
+			fprintf(ofp,"\n");
+		}
+
+		for( i=0; i<p1_end; i++ ){
+			for(  j=0; j<p2_end; j++ ){
+				char fn[100];
+				double gc_count;
+				int ret=0;
+
+				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
+
+				RF(ifp,buf);
+				fclose(ifp);
+
+				ret |= SD( buf, "GC Block Erase: ", gc_count );
+
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", gc_count );
+				//printf("%s",buf);
+			}
+			fprintf(ofp,"\n");
+		}
+
+		for( i=0; i<p1_end; i++ ){
+			for(  j=0; j<p2_end; j++ ){
+				char fn[100];
+				double wa;
+				int ret=0;
+
+				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
+
+				RF(ifp,buf);
+				fclose(ifp);
+
+				ret |= SD( buf, "Write Amplification: ", wa );
+
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", wa );
+				//printf("%s",buf);
+			}
+			fprintf(ofp,"\n");
+		}
+
+		for( i=0; i<p1_end; i++ ){
+			for(  j=0; j<p2_end; j++ ){
+				char fn[100];
+				double gc_count, live_page_copy, block_size;
+				int ret=0;
+
+				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
+
+				RF(ifp,buf);
+				fclose(ifp);
+
+				ret |= SD( buf, "# of GC Page Write: ", live_page_copy );
+				ret |= SD( buf, "# of GC Block Erase: ", gc_count );
+
+				if( change==5 ){
+					block_size=p1[i];
+				}
+				else{
+					block_size=128;
+				}
+
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", live_page_copy / gc_count / block_size );
+				//printf("%s",buf);
+			}
+			fprintf(ofp,"\n");
+		}
 	}
+
+
 
 	fclose(ofp);
 	return 0;

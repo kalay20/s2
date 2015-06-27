@@ -24,7 +24,7 @@ class simple_ssd_controller :
 	public gyc_bus_dev_if
 {
 	// LaiYang
-	/*
+	
 	public:
 		sc_time epoch_length;
 		sc_time epoch_time_now;
@@ -35,11 +35,11 @@ class simple_ssd_controller :
 
 		void add_req_complete_time(sc_time t){
 			if( t >= epoch_time_next ){
-				req_complete_cnt
+				req_complete_cnt;
 			}
-			else
+			else{}
 		}
-	*/
+	
 	// end LaiYang
 	private:
 		gyc_bus_pkt_mm* m_mm;
