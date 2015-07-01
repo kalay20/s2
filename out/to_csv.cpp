@@ -5,15 +5,15 @@
 #include <string.h>
 #include <iostream>
 
-const int el_start=5;
+const int el_start=0;
 const int el_end=5;
-const int wl_start=5;
+const int wl_start=0;
 const int wl_end=5;
-const int dn_start=5;
+const int dn_start=0;
 const int dn_end=5;
-const int bs_start=5;
+const int bs_start=0;
 const int bs_end=4;
-const int ch_start=5;
+const int ch_start=0;
 const int ch_end=5;
 
 //int wl[7] = {1,2,4,8,16,32,64};
@@ -37,8 +37,8 @@ const int change=1;
 const int burst=0;
 
 // ---------------------- change function ------------------------------------
-int p1_end;
-int p2_end;
+int p1_start, p2_start;
+int p1_end, p2_end;
 int *p1, *p2;
 
 void Change_init()
@@ -53,16 +53,16 @@ void Change_init()
 	}
 
 	if( change==1 ){
-		p1_end=wl_end; p1=wl;
-		p2_end=dn_end; p2=dn;
+		p1_start=wl_start; p1_end=wl_end; p1=wl;
+		p2_start=dn_start; p2_end=dn_end; p2=dn;
 	}
 	else if( change==4 ){
-		p1_end=el_end; p1=el;
-		p2_end=dn_end; p2=dn;
+		p1_start=el_start; p1_end=el_end; p1=el;
+		p2_start=dn_start; p2_end=dn_end; p2=dn;
 	}
 	else if( change==5 ){
-		p1_end=bs_end; p1=bs;
-		p2_end=dn_end; p2=dn;
+		p1_start=bs_start; p1_end=bs_end; p1=bs;
+		p2_start=dn_start; p2_end=dn_end; p2=dn;
 	}
 }
 // ---------------------- end change ------------------------------------
@@ -115,8 +115,8 @@ int main( int argc, char* argv[] )
 	for( int wd=0; wd<workload_size; wd++ ){
 		if( workload_bool[wd] == 0 ) continue;
 
-		for( i=0; i<p1_end; i++ ){
-			for(  j=0; j<p2_end; j++ ){
+		for( i=p1_start; i<p1_end; i++ ){
+			for(  j=p2_start; j<p2_end; j++ ){
 				char fn[100];
 				double pr,pw,t;
 				int ret=0;
@@ -145,9 +145,38 @@ int main( int argc, char* argv[] )
 			}
 			fprintf(ofp,"\n");
 		}
+		for( i=p1_start; i<p1_end; i++ ){
+			for(  j=p2_start; j<p2_end; j++ ){
+				char fn[100];
+				double pr,pw,t;
+				int ret=0;
 
-		for( i=0; i<p1_end; i++ ){
-			for(  j=0; j<p2_end; j++ ){
+				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
+				//printf("%s\n",fn);
+				ifp = fopen(fn,"r");
+				if( ifp==NULL ) H_error(fn);
+
+				RF(ifp,buf);
+				fclose(ifp);
+
+				ret |= SD( buf, "User Page Write: ", pw );
+				ret |= SD( buf, "Total execution time: ", t );
+
+				t /= (double)1000.0*1000.0*1000.0*1000.0;
+
+				if( ret != 0 ){
+					fprintf( ofp, "%f,", 0 );
+					continue;
+				}
+
+				fprintf( ofp, "%f,", (pw)/t );
+				//printf("%s",buf);
+			}
+			fprintf(ofp,"\n");
+		}
+
+		for( i=p1_start; i<p1_end; i++ ){
+			for(  j=p2_start; j<p2_end; j++ ){
 				char fn[100];
 				double latency;
 				int ret=0;
@@ -173,8 +202,8 @@ int main( int argc, char* argv[] )
 			fprintf(ofp,"\n");
 		}
 
-		for( i=0; i<p1_end; i++ ){
-			for(  j=0; j<p2_end; j++ ){
+		for( i=p1_start; i<p1_end; i++ ){
+			for(  j=p2_start; j<p2_end; j++ ){
 				char fn[100];
 				double gc_count;
 				int ret=0;
@@ -200,8 +229,8 @@ int main( int argc, char* argv[] )
 			fprintf(ofp,"\n");
 		}
 
-		for( i=0; i<p1_end; i++ ){
-			for(  j=0; j<p2_end; j++ ){
+		for( i=p1_start; i<p1_end; i++ ){
+			for(  j=p2_start; j<p2_end; j++ ){
 				char fn[100];
 				double wa;
 				int ret=0;
@@ -227,8 +256,8 @@ int main( int argc, char* argv[] )
 			fprintf(ofp,"\n");
 		}
 
-		for( i=0; i<p1_end; i++ ){
-			for(  j=0; j<p2_end; j++ ){
+		for( i=p1_start; i<p1_end; i++ ){
+			for(  j=p2_start; j<p2_end; j++ ){
 				char fn[100];
 				double gc_count, live_page_copy, block_size;
 				int ret=0;
