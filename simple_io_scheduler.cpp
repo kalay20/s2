@@ -108,12 +108,15 @@ void simple_io_scheduler::trace_replayer() {
 	lpn_t req_addr;
 	lpn_t req_size;
 	int req_op;
+	gyc_bus_pkt* new_tran = NULL;
 
 	/* we use line number as each I/O transaction' id */
 	tran_id_t line_number = 0;
 
 	cout << "Start simulation..." << endl;
-	while (m_trace_fs >> req_time >> req_dev >> req_addr >> req_size >> req_op) {
+	while ( new_tran != NULL ||  m_trace_fs >> req_time >> req_dev >> req_addr >> req_size >> req_op) {
+		// check if there's pending req, if not check if there are lines left in trace file
+	
 		//cout << line_number << " ";
 		if(get_last_time_for_load() > sc_time(0, SC_MS) && get_last_time_for_load() > sc_time(req_time, SC_MS)){
 			line_number++;
@@ -146,7 +149,7 @@ void simple_io_scheduler::trace_replayer() {
 		lpn_t page_count = last_page_addr - first_page_addr + 1;
 
 		/* create new I/O transaction */
-		gyc_bus_pkt* new_tran = m_mm->alloc();
+		new_tran = m_mm->alloc();
 		new_tran->set_bus_pkt_dest(1);
 		new_tran->enable_ssd_req_ext();
 		new_tran->set_req_lpn(first_page_addr);
@@ -249,6 +252,10 @@ simple_io_scheduler::simple_io_scheduler(
 	m_download_ch_busy = false;
 	m_upload_ch_busy = false;
 
+	// LaiYang
+	req_queue_size = 32;
+	// end LaiYang
+	
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
 	m_global_max_rd_req_rate = 0;
 	m_global_max_wr_req_rate = 0;

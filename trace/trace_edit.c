@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
 			if( now_progress != last_progress ){
 				for( int i=0; i<now_progress-last_progress; i++ ){
 					printf(".");
+					fflush(stdout);
 				}
 				last_progress = now_progress;
 			}

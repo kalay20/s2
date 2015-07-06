@@ -1,0 +1,56 @@
+./simple_io_scheduler.cpp-		trace_last_ifs.close();
+./simple_io_scheduler.cpp-		cout << tmp_time <<" for init"<< endl;
+./simple_io_scheduler.cpp-		
+./simple_io_scheduler.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
+./simple_io_scheduler.cpp:		set_last_time_for_load(sc_time(tmp_time, SC_MS));
+./simple_io_scheduler.cpp-	}
+./simple_io_scheduler.cpp-	else if(last > 0) { //save how many request
+./simple_io_scheduler.cpp:		set_last_time_for_save(sc_time(last, SC_MS));
+./simple_io_scheduler.cpp:		set_last_time_for_load(sc_time(0, SC_MS));
+./simple_io_scheduler.cpp-	}
+./simple_io_scheduler.cpp-	else{
+./simple_io_scheduler.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
+./simple_io_scheduler.cpp:		set_last_time_for_load(sc_time(0, SC_MS));
+./simple_io_scheduler.cpp-	}
+./simple_io_scheduler.cpp-
+./simple_io_scheduler.cpp-	m_recv_buf = NULL;
+--
+./simple_io_scheduler.h-		void recv_next_pkt(int bus_id, gyc_bus_pkt* next_pkt_to_recv);
+./simple_io_scheduler.h-		void on_recv_completed(int bus_id);
+./simple_io_scheduler.h-
+./simple_io_scheduler.h:		void set_last_time_for_save(sc_time last) { m_last_time_for_save = last; }
+./simple_io_scheduler.h-		sc_time get_last_time_for_save() const { return m_last_time_for_save; }
+./simple_io_scheduler.h:		void set_last_time_for_load(sc_time last) { m_last_time_for_load = last;}
+./simple_io_scheduler.h-		sc_time get_last_time_for_load() const { return m_last_time_for_load; }
+./simple_io_scheduler.h-};
+./simple_io_scheduler.h-
+--
+./simple_ssd_controller.cpp-	set_last_path(trace_path);
+./simple_ssd_controller.cpp-	set_last_info(last);
+./simple_ssd_controller.cpp-	if(last == 0){ //load from which line
+./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
+./simple_ssd_controller.cpp-	}
+./simple_ssd_controller.cpp-	else if(last > 0) { //save how many request
+./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(last, SC_MS));
+./simple_ssd_controller.cpp-	}
+./simple_ssd_controller.cpp-	else{
+./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
+./simple_ssd_controller.cpp-	}
+./simple_ssd_controller.cpp-
+./simple_ssd_controller.cpp-#ifdef DEADLINE_AWARE_SLC_POLICY_SELF_TUNING
+--
+./simple_ssd_controller.cpp-		//cout << mytest << " par @@ " << next_pkt_to_recv->get_req_arrival_time() << endl;
+./simple_ssd_controller.cpp-		save_last_use(get_last_path(), get_last_info(), get_number_of_dice());
+./simple_ssd_controller.cpp-
+./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(-1, SC_MS));
+./simple_ssd_controller.cpp-
+./simple_ssd_controller.cpp-		//exit(-1);
+./simple_ssd_controller.cpp-	}
+--
+./simple_ssd_controller.h-		std::string get_last_path(){ return m_last_path; }
+./simple_ssd_controller.h-		void set_last_info(double last){ m_last_info = last; }
+./simple_ssd_controller.h-		double get_last_info(){ return m_last_info; }
+./simple_ssd_controller.h:		void set_last_time_for_save(const sc_time& req_time){ m_last_time_for_save = req_time; }
+./simple_ssd_controller.h-		sc_time get_last_time_for_save(){ return m_last_time_for_save; };
+./simple_ssd_controller.h-		void save_last_use(std::string trace_path, double last_info, int number_of_dice) const;
+./simple_ssd_controller.h-		void load_last_use(std::string trace_path, int number_of_dice) ;
