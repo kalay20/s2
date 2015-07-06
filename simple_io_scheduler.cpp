@@ -110,13 +110,15 @@ void simple_io_scheduler::trace_replayer() {
 	int req_op;
 	gyc_bus_pkt* new_tran = NULL;
 
+	bool flag=true;
+
 	/* we use line number as each I/O transaction' id */
 	tran_id_t line_number = 0;
 
 	cout << "Start simulation..." << endl;
 	while ( new_tran != NULL ||  m_trace_fs >> req_time >> req_dev >> req_addr >> req_size >> req_op) {
 		// check if there's pending req, if not check if there are lines left in trace file
-	
+		
 		//cout << line_number << " ";
 		if(get_last_time_for_load() > sc_time(0, SC_MS) && get_last_time_for_load() > sc_time(req_time, SC_MS)){
 			line_number++;
@@ -127,84 +129,99 @@ void simple_io_scheduler::trace_replayer() {
 			break;
 		}
 
-		/* check request format */
-		if (req_dev != m_trace_active_dev_idx) {
-			continue;
-		}
-		assert(req_time >= 0.0);
-		assert(req_addr >= 0);
-		assert(req_size >= 1);
-		assert(req_op == 0 || req_op == 1);
+		if( new_tran == NULL ){
+			/* check request format */
+			if (req_dev != m_trace_active_dev_idx) {
+				continue;
+			}
+			assert(req_time >= 0.0);
+			assert(req_addr >= 0);
+			assert(req_size >= 1);
+			assert(req_op == 0 || req_op == 1);
 
-		/* wait until request is happened */
-		assert(sc_time(req_time, SC_MS) >= sc_time_stamp());
-		if (sc_time(req_time, SC_MS) > sc_time_stamp()) {
-			wait(sc_time(req_time, SC_MS) - sc_time_stamp());
-		}
-		assert(sc_time(req_time, SC_MS) == sc_time_stamp());
+			/* wait until request is happened */
+			//assert(sc_time(req_time, SC_MS) >= sc_time_stamp()); // LaiYang disable
+			if (sc_time(req_time, SC_MS) > sc_time_stamp()) {
+				wait(sc_time(req_time, SC_MS) - sc_time_stamp());
+			}
+			//assert(sc_time(req_time, SC_MS) == sc_time_stamp()); // LaiYang disable
 
-		/* convert unit from sector to page */
-		lpn_t first_page_addr = req_addr / SECTOR_PER_PAGE;
-		lpn_t last_page_addr = (req_addr + req_size - 1) / SECTOR_PER_PAGE;
-		lpn_t page_count = last_page_addr - first_page_addr + 1;
+			/* convert unit from sector to page */
+			lpn_t first_page_addr = req_addr / SECTOR_PER_PAGE;
+			lpn_t last_page_addr = (req_addr + req_size - 1) / SECTOR_PER_PAGE;
+			lpn_t page_count = last_page_addr - first_page_addr + 1;
 
-		/* create new I/O transaction */
-		new_tran = m_mm->alloc();
-		new_tran->set_bus_pkt_dest(1);
-		new_tran->enable_ssd_req_ext();
-		new_tran->set_req_lpn(first_page_addr);
-		new_tran->set_req_size(page_count);
-		new_tran->set_req_remain_size(page_count);
-		new_tran->set_req_arrival_time(sc_time(req_time, SC_MS));
-		if (req_op == 1) {
-			new_tran->set_req_type(SSD_REQ_TYP_RD);
-			new_tran->set_bus_pkt_prio(1);
-			new_tran->set_bus_pkt_delay(sc_time(HOST_BUS_IO_CYCLE * HOST_BUS_HEADER_SIZE, SC_MS));
-		} else if (req_op == 0) {
-			new_tran->set_req_type(SSD_REQ_TYP_WR);
-			new_tran->set_bus_pkt_prio(0);
-			new_tran->set_bus_pkt_delay(sc_time(HOST_BUS_IO_CYCLE * (HOST_BUS_HEADER_SIZE + new_tran->get_req_size() * SECTOR_PER_PAGE * BYTE_PER_SECTOR), SC_MS));
-		} else {
-			assert(0);
-		}
+			/* create new I/O transaction */
+			new_tran = m_mm->alloc();
+			new_tran->set_bus_pkt_dest(1);
+			new_tran->enable_ssd_req_ext();
+			new_tran->set_req_lpn(first_page_addr);
+			new_tran->set_req_size(page_count);
+			new_tran->set_req_remain_size(page_count);
+			new_tran->set_req_arrival_time(sc_time(req_time, SC_MS));
+			if (req_op == 1) {
+				new_tran->set_req_type(SSD_REQ_TYP_RD);
+				new_tran->set_bus_pkt_prio(1);
+				new_tran->set_bus_pkt_delay(sc_time(HOST_BUS_IO_CYCLE * HOST_BUS_HEADER_SIZE, SC_MS));
+			} else if (req_op == 0) {
+				new_tran->set_req_type(SSD_REQ_TYP_WR);
+				new_tran->set_bus_pkt_prio(0);
+				new_tran->set_bus_pkt_delay(sc_time(HOST_BUS_IO_CYCLE * (HOST_BUS_HEADER_SIZE + new_tran->get_req_size() * SECTOR_PER_PAGE * BYTE_PER_SECTOR), SC_MS));
+			} else {
+				assert(0);
+			}
 
 #ifdef GYC_PAPER_REQ_RATE_PLOT
-		switch (new_tran->get_req_type()) {
-			case SSD_REQ_TYP_RD:
-				m_sampled_rd_req_rate++;
-				//m_sampled_rd_req_rate += new_tran->get_req_size();
-				break;
-			case SSD_REQ_TYP_WR:
-				m_sampled_wr_req_rate++;
-				//m_sampled_wr_req_rate += new_tran->get_req_size();
-				break;
-			default:
-				assert(0);
-				break;
-		}
+			switch (new_tran->get_req_type()) {
+				case SSD_REQ_TYP_RD:
+					m_sampled_rd_req_rate++;
+					//m_sampled_rd_req_rate += new_tran->get_req_size();
+					break;
+				case SSD_REQ_TYP_WR:
+					m_sampled_wr_req_rate++;
+					//m_sampled_wr_req_rate += new_tran->get_req_size();
+					break;
+				default:
+					assert(0);
+					break;
+			}
 #endif
+			line_number++;
+		}
+		else {
+			wait( event_trace_continue );
+		}
 
 #ifdef IO_SCHEDULER__READ_OVER_WRITE
 		switch (new_tran->get_req_type()) {
 			case SSD_REQ_TYP_RD:
-				m_row_rd_req_queue.push_back(new_tran);
+				if( m_row_rd_req_queue.size() < req_queue_size ){
+					m_row_rd_req_queue.push_back(new_tran);
+					new_tran = NULL;
+				}
 				break;
 			case SSD_REQ_TYP_WR:
-				m_row_wr_req_queue.push_back(new_tran);
+				if( m_row_wr_req_queue.size() < req_queue_size ){
+					m_row_wr_req_queue.push_back(new_tran);
+					new_tran = NULL;
+				}
 				break;
 			default:
 				assert(0);
 				break;
 		}
 #else
-		m_noop_req_queue.push_back(new_tran);
+		if( m_noop_req_queue.size() < req_queue_size*2 ){
+			m_noop_req_queue.push_back(new_tran);
+			new_tran = NULL;
+		}
 #endif
 
-		if (peek_next_pkt_to_send(m_download_ch_id)) {
+		if ( (flag==true) && peek_next_pkt_to_send(m_download_ch_id)) {
 			download_ch_port->require_send_next_pkt();
+			flag=false;
 		}
-
-		line_number++;
+		
 	}
 
 	cout << "Reached the end of trace file with total number of transactions = " << line_number << endl;
@@ -253,7 +270,7 @@ simple_io_scheduler::simple_io_scheduler(
 	m_upload_ch_busy = false;
 
 	// LaiYang
-	req_queue_size = 32;
+	req_queue_size = 512;
 	// end LaiYang
 	
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
@@ -370,15 +387,15 @@ void simple_io_scheduler::on_send_completed(int bus_id) {
 		if (!m_row_rd_req_queue.empty() || !m_row_wr_req_queue.empty()) {
 			download_ch_port->require_send_next_pkt();
 		}
-		return;
 #else
 		assert(m_download_ch_busy);
 		m_download_ch_busy = false;
 		if (!m_noop_req_queue.empty()) {
 			download_ch_port->require_send_next_pkt();
 		}
-		return;
 #endif
+		event_trace_continue.notify();
+		return;
 	} else if (bus_id == m_upload_ch_id) {
 		assert(0);
 	} else {

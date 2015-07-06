@@ -80,6 +80,10 @@ class simple_io_scheduler :
 
 		sc_port<gyc_bus_dev_cb> download_ch_port;
 		sc_port<gyc_bus_dev_cb> upload_ch_port;
+		
+		// LaiYang
+		sc_event event_trace_continue;
+		// end LaiYang
 
 		int get_minimum_number_of_dice_required() const;
 
