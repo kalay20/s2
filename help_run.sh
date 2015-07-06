@@ -1,0 +1,21 @@
+change=1 \
+el_start=0 \
+el_end=5 \
+wl_start=0 \
+wl_end=5 \
+dn_start=0 \
+dn_end=5 \
+bs_start=0 \
+bs_end=4 \
+ch_start=0 \
+ch_end=5 \
+job_max=0 \
+cpu_max=0 \
+delay=0 \
+delay_small=0 \
+if_test=0 \
+wd_burst=0 \
+wd_start=0 \
+wd_end=1 \
+bash run.sh
+
