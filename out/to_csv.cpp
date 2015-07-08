@@ -148,7 +148,7 @@ int main( int argc, char* argv[] )
 		for( i=p1_start; i<p1_end; i++ ){
 			for(  j=p2_start; j<p2_end; j++ ){
 				char fn[100];
-				double pr,pw,t;
+				double iops,pr,pw,t;
 				int ret=0;
 
 				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
@@ -159,17 +159,15 @@ int main( int argc, char* argv[] )
 				RF(ifp,buf);
 				fclose(ifp);
 
-				ret |= SD( buf, "User Page Write: ", pw );
-				ret |= SD( buf, "Total execution time: ", t );
+				ret |= SD( buf, "Peak IOPS: ", iops );
 
-				t /= (double)1000.0*1000.0*1000.0*1000.0;
 
 				if( ret != 0 ){
 					fprintf( ofp, "%f,", 0 );
 					continue;
 				}
 
-				fprintf( ofp, "%f,", (pw)/t );
+				fprintf( ofp, "%f,", iops );
 				//printf("%s",buf);
 			}
 			fprintf(ofp,"\n");
