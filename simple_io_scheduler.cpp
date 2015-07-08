@@ -13,6 +13,11 @@
 using namespace std;
 using namespace sc_core;
 
+// LaiYang
+extern bool all_req_completed;
+// end LaiYang
+
+
 void simple_io_scheduler::load_trace_fs(std::string trace_path, int trace_active_dev_idx) {
 
 	cout << "[INFO] use disk " << trace_active_dev_idx << " in trace file (" << trace_path << ") for simulation" << endl;
@@ -110,14 +115,13 @@ void simple_io_scheduler::trace_replayer() {
 	int req_op;
 	gyc_bus_pkt* new_tran = NULL;
 
-	bool flag=true;
 
 	/* we use line number as each I/O transaction' id */
 	tran_id_t line_number = 0;
 
 	cout << "Start simulation..." << endl;
+	// check if there's pending req, if not check if there are lines left in trace file
 	while ( new_tran != NULL ||  m_trace_fs >> req_time >> req_dev >> req_addr >> req_size >> req_op) {
-		// check if there's pending req, if not check if there are lines left in trace file
 		
 		//cout << line_number << " ";
 		if(get_last_time_for_load() > sc_time(0, SC_MS) && get_last_time_for_load() > sc_time(req_time, SC_MS)){
@@ -129,6 +133,7 @@ void simple_io_scheduler::trace_replayer() {
 			break;
 		}
 
+		// check if there's pending req
 		if( new_tran == NULL ){
 			/* check request format */
 			if (req_dev != m_trace_active_dev_idx) {
@@ -198,12 +203,14 @@ void simple_io_scheduler::trace_replayer() {
 				if( m_row_rd_req_queue.size() < req_queue_size ){
 					m_row_rd_req_queue.push_back(new_tran);
 					new_tran = NULL;
+					req_added_but_not_done++;
 				}
 				break;
 			case SSD_REQ_TYP_WR:
 				if( m_row_wr_req_queue.size() < req_queue_size ){
 					m_row_wr_req_queue.push_back(new_tran);
 					new_tran = NULL;
+					req_added_but_not_done++;
 				}
 				break;
 			default:
@@ -217,9 +224,8 @@ void simple_io_scheduler::trace_replayer() {
 		}
 #endif
 
-		if ( (flag==true) && peek_next_pkt_to_send(m_download_ch_id)) {
+		if ( peek_next_pkt_to_send(m_download_ch_id)) {
 			download_ch_port->require_send_next_pkt();
-			flag=false;
 		}
 		
 	}
@@ -227,6 +233,7 @@ void simple_io_scheduler::trace_replayer() {
 	cout << "Reached the end of trace file with total number of transactions = " << line_number << endl;
 	m_trace_fs.close();
 }
+
 
 simple_io_scheduler::simple_io_scheduler(
 		sc_module_name module_name,
@@ -271,6 +278,7 @@ simple_io_scheduler::simple_io_scheduler(
 
 	// LaiYang
 	req_queue_size = 512;
+	req_added_but_not_done = 0;
 	// end LaiYang
 	
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
@@ -444,6 +452,12 @@ void simple_io_scheduler::on_recv_completed(int bus_id) {
 		assert(m_recv_buf->get_req_remain_size() == 0);
 		assert(sc_time_stamp() > m_recv_buf->get_req_arrival_time());
 		msec_t resp_time = (sc_time_stamp() - m_recv_buf->get_req_arrival_time()).to_seconds() * 1000;
+
+		// LaiYang
+		req_added_but_not_done--;
+		// check if all trace file complete and all req in the queue or spreaded down were completed
+		if( !m_trace_fs.is_open() && req_added_but_not_done==0 ){ all_req_completed=true; cout<< "All_req_complete: " <<sc_time_stamp()<<endl; }
+		// end LaiYang
 
 		switch (m_recv_buf->get_req_type()) {
 			case SSD_REQ_TYP_RD:

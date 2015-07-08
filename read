@@ -1,56 +1,157 @@
-./simple_io_scheduler.cpp-		trace_last_ifs.close();
-./simple_io_scheduler.cpp-		cout << tmp_time <<" for init"<< endl;
-./simple_io_scheduler.cpp-		
-./simple_io_scheduler.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
-./simple_io_scheduler.cpp:		set_last_time_for_load(sc_time(tmp_time, SC_MS));
+./gyc_bus.h-							m_pkt = pkt;
+./gyc_bus.h-							m_src_id = src_id;
+./gyc_bus.h-							m_dest_id = dest_id;
+./gyc_bus.h-						}
+./gyc_bus.h-					}
+./gyc_bus.h-				}
+./gyc_bus.h-			}
+./gyc_bus.h-			if (m_pkt) {
+./gyc_bus.h-				m_rr_src_id = (m_src_id + 1) % dev.size();
+./gyc_bus.h-				m_busy = true;
+./gyc_bus.h:				m_transfer_done_event.notify(m_pkt->get_bus_pkt_delay());
+./gyc_bus.h-				dev[m_src_id]->on_send_started(m_bus_id);
+./gyc_bus.h-				dev[m_dest_id]->recv_next_pkt(m_bus_id, m_pkt);
+./gyc_bus.h-			} else {
+./gyc_bus.h-				//cout << "At " << sc_time_stamp().to_seconds() << ", " << name() << " has nothing to transfer" << endl;
+./gyc_bus.h-			}
+./gyc_bus.h-		}
+./gyc_bus.h-		void on_transfer_done() {
+./gyc_bus.h-			assert(m_busy && m_pkt && m_src_id != -1 && m_dest_id != -1);
+./gyc_bus.h-			dev[m_src_id]->on_send_completed(m_bus_id);
+./gyc_bus.h-			dev[m_dest_id]->on_recv_completed(m_bus_id);
+./gyc_bus.h-
+./gyc_bus.h-			m_busy = false;
+./gyc_bus.h-			m_pkt = NULL;
+./gyc_bus.h-			m_src_id= -1;
+./gyc_bus.h-			m_dest_id= -1;
+./gyc_bus.h:			m_require_sched.notify(SC_ZERO_TIME);
+./gyc_bus.h-		}
+./gyc_bus.h-	public:
+./gyc_bus.h-		sc_port<gyc_bus_dev_if, 0> dev;
+./gyc_bus.h-		SC_CTOR(gyc_bus) {
+./gyc_bus.h-			m_bus_id = -1;
+./gyc_bus.h-			m_busy = false;
+./gyc_bus.h-			m_pkt = NULL;
+./gyc_bus.h-			m_src_id = -1;
+./gyc_bus.h-			m_dest_id = -1;
+./gyc_bus.h-			m_rr_src_id = 0;
+--
+./gyc_bus.h-			SC_METHOD(sched);
+./gyc_bus.h-			sensitive << m_require_sched;
+./gyc_bus.h-			dont_initialize();
+./gyc_bus.h-
+./gyc_bus.h-			SC_METHOD(on_transfer_done);
+./gyc_bus.h-			sensitive << m_transfer_done_event;
+./gyc_bus.h-			dont_initialize();
+./gyc_bus.h-		}
+./gyc_bus.h-		void set_bus_id(int bus_id) { m_bus_id = bus_id; }
+./gyc_bus.h-		int get_bus_id() const { return m_bus_id; }
+./gyc_bus.h:		void require_send_next_pkt() { if (!m_busy) m_require_sched.notify(SC_ZERO_TIME); }
+./gyc_bus.h:		void require_recv_next_pkt() { if (!m_busy) m_require_sched.notify(SC_ZERO_TIME); }
+./gyc_bus.h-};
+./gyc_bus.h-
+./gyc_bus.h-#endif
+./gyc_bus.h-
+--
+./simple_die_controller.cpp-			/* since the op mode of die will be changed at the beginning of receiving pkt */
+./simple_die_controller.cpp-			assert(0);
+./simple_die_controller.cpp-			break;
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-		case DIE_READ_MODE:
+./simple_die_controller.cpp-			assert(m_data_reg);
+./simple_die_controller.cpp-			assert(m_data_reg->get_op_type() == SSD_OP_TYP_RD);
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			assert(!m_die_busy);
+./simple_die_controller.cpp-			m_die_busy = true;
+./simple_die_controller.cpp:			m_exec_completed_event.notify(sc_time(MLC_READ_LATENCY, SC_MS));
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			break;
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-		case DIE_PROGRAM_MODE:
+./simple_die_controller.cpp-			assert(m_cache_reg);
+./simple_die_controller.cpp-			assert(m_cache_reg->get_op_type() == SSD_OP_TYP_WR);
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			/* perform pipeline write */
+./simple_die_controller.cpp-			if (!m_data_reg) {
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-				/* copy write operation from cache to data register and start executing */
+./simple_die_controller.cpp-				assert(!m_die_busy);
+./simple_die_controller.cpp-				m_data_reg = m_cache_reg;
+./simple_die_controller.cpp-				m_die_busy = true;
+./simple_die_controller.cpp-				if (m_data_reg->get_op_in_slc()) {
+./simple_die_controller.cpp:					m_exec_completed_event.notify(sc_time(SLC_PROGRAM_LATENCY, SC_MS));
+./simple_die_controller.cpp-				} else {
+./simple_die_controller.cpp:					m_exec_completed_event.notify(sc_time(MLC_PROGRAM_LATENCY, SC_MS));
+./simple_die_controller.cpp-				}
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-				/* clear cache register and be ready for receiving next write operation */
+./simple_die_controller.cpp-				m_cache_reg = NULL;
+./simple_die_controller.cpp-				belonged_channel->require_recv_next_pkt();
+./simple_die_controller.cpp-			}
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			break;
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-		case DIE_ERASE_MODE:
+./simple_die_controller.cpp-			assert(!m_cache_reg);
+./simple_die_controller.cpp-			assert(m_data_reg);
+./simple_die_controller.cpp-			assert(m_data_reg->get_op_type() == SSD_OP_TYP_ER);
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			assert(!m_die_busy);
+./simple_die_controller.cpp-			m_die_busy = true;
+./simple_die_controller.cpp:			m_exec_completed_event.notify(sc_time(MLC_ERASE_LATENCY, SC_MS));
+./simple_die_controller.cpp-			break;
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-		default:
+./simple_die_controller.cpp-			/* unknown die operation mode */
+./simple_die_controller.cpp-			assert(0);
+./simple_die_controller.cpp-	}
+./simple_die_controller.cpp-}
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-void simple_die_controller::on_exec_completed() {
+./simple_die_controller.cpp-	//cout << "At " << sc_time_stamp().to_seconds() << ", " << name() << " on_exec_completed" << endl;
+--
+./simple_die_controller.cpp-			m_data_reg = NULL;
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			/* perform pipeline write */
+./simple_die_controller.cpp-			if (m_cache_reg) {
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-				/* copy write operation from cache to data register and start executing */
+./simple_die_controller.cpp-				assert(m_cache_reg->get_op_type() == SSD_OP_TYP_WR);
+./simple_die_controller.cpp-				m_data_reg = m_cache_reg;
+./simple_die_controller.cpp-				m_die_busy = true;
+./simple_die_controller.cpp-				if (m_data_reg->get_op_in_slc()) {
+./simple_die_controller.cpp:					m_exec_completed_event.notify(sc_time(SLC_PROGRAM_LATENCY, SC_MS));
+./simple_die_controller.cpp-				} else {
+./simple_die_controller.cpp:					m_exec_completed_event.notify(sc_time(MLC_PROGRAM_LATENCY, SC_MS));
+./simple_die_controller.cpp-				}
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-				/* clear cache register and be ready for receiving next write operation */
+./simple_die_controller.cpp-				//cout << "At " << sc_time_stamp().to_seconds() << ", " << name() << " clear cache reg for next pkt" << endl;
+./simple_die_controller.cpp-				m_cache_reg = NULL;
+./simple_die_controller.cpp-				belonged_channel->require_recv_next_pkt();
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-			} else {
+./simple_die_controller.cpp-
+./simple_die_controller.cpp-				/* end of pipeline write since both cache and data register are empty */
+--
+./simple_io_scheduler.cpp-		if (!m_row_rd_req_queue.empty() || !m_row_wr_req_queue.empty()) {
+./simple_io_scheduler.cpp-			download_ch_port->require_send_next_pkt();
+./simple_io_scheduler.cpp-		}
+./simple_io_scheduler.cpp-#else
+./simple_io_scheduler.cpp-		assert(m_download_ch_busy);
+./simple_io_scheduler.cpp-		m_download_ch_busy = false;
+./simple_io_scheduler.cpp-		if (!m_noop_req_queue.empty()) {
+./simple_io_scheduler.cpp-			download_ch_port->require_send_next_pkt();
+./simple_io_scheduler.cpp-		}
+./simple_io_scheduler.cpp-#endif
+./simple_io_scheduler.cpp:		event_trace_continue.notify();
+./simple_io_scheduler.cpp-		return;
+./simple_io_scheduler.cpp-	} else if (bus_id == m_upload_ch_id) {
+./simple_io_scheduler.cpp-		assert(0);
+./simple_io_scheduler.cpp-	} else {
+./simple_io_scheduler.cpp-		assert(0);
 ./simple_io_scheduler.cpp-	}
-./simple_io_scheduler.cpp-	else if(last > 0) { //save how many request
-./simple_io_scheduler.cpp:		set_last_time_for_save(sc_time(last, SC_MS));
-./simple_io_scheduler.cpp:		set_last_time_for_load(sc_time(0, SC_MS));
-./simple_io_scheduler.cpp-	}
-./simple_io_scheduler.cpp-	else{
-./simple_io_scheduler.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
-./simple_io_scheduler.cpp:		set_last_time_for_load(sc_time(0, SC_MS));
-./simple_io_scheduler.cpp-	}
+./simple_io_scheduler.cpp-	assert(0);
+./simple_io_scheduler.cpp-}
 ./simple_io_scheduler.cpp-
-./simple_io_scheduler.cpp-	m_recv_buf = NULL;
---
-./simple_io_scheduler.h-		void recv_next_pkt(int bus_id, gyc_bus_pkt* next_pkt_to_recv);
-./simple_io_scheduler.h-		void on_recv_completed(int bus_id);
-./simple_io_scheduler.h-
-./simple_io_scheduler.h:		void set_last_time_for_save(sc_time last) { m_last_time_for_save = last; }
-./simple_io_scheduler.h-		sc_time get_last_time_for_save() const { return m_last_time_for_save; }
-./simple_io_scheduler.h:		void set_last_time_for_load(sc_time last) { m_last_time_for_load = last;}
-./simple_io_scheduler.h-		sc_time get_last_time_for_load() const { return m_last_time_for_load; }
-./simple_io_scheduler.h-};
-./simple_io_scheduler.h-
---
-./simple_ssd_controller.cpp-	set_last_path(trace_path);
-./simple_ssd_controller.cpp-	set_last_info(last);
-./simple_ssd_controller.cpp-	if(last == 0){ //load from which line
-./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
-./simple_ssd_controller.cpp-	}
-./simple_ssd_controller.cpp-	else if(last > 0) { //save how many request
-./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(last, SC_MS));
-./simple_ssd_controller.cpp-	}
-./simple_ssd_controller.cpp-	else{
-./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(0, SC_MS));
-./simple_ssd_controller.cpp-	}
-./simple_ssd_controller.cpp-
-./simple_ssd_controller.cpp-#ifdef DEADLINE_AWARE_SLC_POLICY_SELF_TUNING
---
-./simple_ssd_controller.cpp-		//cout << mytest << " par @@ " << next_pkt_to_recv->get_req_arrival_time() << endl;
-./simple_ssd_controller.cpp-		save_last_use(get_last_path(), get_last_info(), get_number_of_dice());
-./simple_ssd_controller.cpp-
-./simple_ssd_controller.cpp:		set_last_time_for_save(sc_time(-1, SC_MS));
-./simple_ssd_controller.cpp-
-./simple_ssd_controller.cpp-		//exit(-1);
-./simple_ssd_controller.cpp-	}
---
-./simple_ssd_controller.h-		std::string get_last_path(){ return m_last_path; }
-./simple_ssd_controller.h-		void set_last_info(double last){ m_last_info = last; }
-./simple_ssd_controller.h-		double get_last_info(){ return m_last_info; }
-./simple_ssd_controller.h:		void set_last_time_for_save(const sc_time& req_time){ m_last_time_for_save = req_time; }
-./simple_ssd_controller.h-		sc_time get_last_time_for_save(){ return m_last_time_for_save; };
-./simple_ssd_controller.h-		void save_last_use(std::string trace_path, double last_info, int number_of_dice) const;
-./simple_ssd_controller.h-		void load_last_use(std::string trace_path, int number_of_dice) ;
+./simple_io_scheduler.cpp-bool simple_io_scheduler::can_recv_next_pkt(int bus_id, const gyc_bus_pkt* next_pkt_to_recv) const {

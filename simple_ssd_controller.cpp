@@ -18,6 +18,10 @@
 using namespace std;
 using namespace sc_core;
 
+// LaiYang
+extern bool all_req_completed;
+// end LaiYang
+
 double geometric_mean(const std::vector<long double> &data) {
 	long double m = 1.0;
 	long long ex = 0;
@@ -30,6 +34,41 @@ double geometric_mean(const std::vector<long double> &data) {
 	}
 	return std::pow(std::numeric_limits<long double>::radix,ex * invN) * std::pow(m,invN);
 }
+
+
+// LaiYang
+void simple_ssd_controller::spiner(){
+	size_t max_io = 0;
+	ppn_t  last_io = 0;
+	ppn_t  this_io;
+	ppn_t  diff_io;
+
+	
+	wait(SC_ZERO_TIME);
+	while( !all_req_completed ){
+		wait(el);
+		this_io = x_total_io(); diff_io = this_io - last_io; last_io = this_io;
+		if( diff_io > max_io ) max_io = diff_io;
+	}
+
+	printf("Epoch -----------\n" );
+	printf("Finish with total IO: %d, epoch length: %f sec\n", x_total_io(), el.to_seconds() );
+	printf("Peak IOPS: %f\n", (double)max_io / el.to_seconds() );
+	printf("Epoch -----------\n" );
+}
+
+ppn_t simple_ssd_controller::x_total_io(){
+	ppn_t total_number_of_io_page_read = 0;
+	ppn_t total_number_of_io_page_write = 0;
+
+	for (int die_idx = 0; die_idx < die_schedulers.size(); die_idx++){
+		total_number_of_io_page_read += die_schedulers[die_idx]->number_of_io_page_read;
+		total_number_of_io_page_write += die_schedulers[die_idx]->number_of_io_page_write;
+	}
+
+	return total_number_of_io_page_write + total_number_of_io_page_read;
+}
+// end LaiYang
 
 simple_ssd_controller::simple_ssd_controller (
 		sc_module_name module_name,
@@ -50,6 +89,9 @@ simple_ssd_controller::simple_ssd_controller (
 	epoch_length = sc_time(10,SC_MS);
 	epoch_time_now = sc_time(0,SC_MS);
 	epoch_time_next = epoch_time_now + epoch_length;
+	
+	el=sc_time(100,SC_MS);
+	SC_THREAD(spiner)
 	// end LaiYang
 #ifdef GYC_PAPER_D_MONITOR
 	m_mlc_clean_amount = 0.0;

@@ -29,9 +29,6 @@ class simple_io_scheduler :
 #else
 		std::deque<gyc_bus_pkt *> m_noop_req_queue;
 #endif
-		// LaiYang
-		size_t  req_queue_size;
-		// end LaiYang
 
 		void load_trace_fs(std::string trace_path, int trace_active_dev_idx);
 		void trace_replayer();
@@ -83,6 +80,9 @@ class simple_io_scheduler :
 		
 		// LaiYang
 		sc_event event_trace_continue;
+		size_t req_added_but_not_done;
+		size_t  req_queue_size;
+
 		// end LaiYang
 
 		int get_minimum_number_of_dice_required() const;

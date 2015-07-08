@@ -26,6 +26,11 @@ class simple_ssd_controller :
 	// LaiYang
 	
 	public:
+		sc_time el;
+
+		void spiner();
+		ppn_t x_total_io();
+
 		sc_time epoch_length;
 		sc_time epoch_time_now;
 		sc_time epoch_time_next;

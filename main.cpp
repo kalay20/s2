@@ -20,6 +20,9 @@ using namespace std;
 using namespace sc_core;
 
 
+// LaiYang
+bool all_req_completed=false;
+// end LaiYang
 
 
 int sc_main(int argc, char* argv[]) {
@@ -99,6 +102,7 @@ int sc_main(int argc, char* argv[]) {
 	sc_start();
 	
 	// LaiYang
+	assert( all_req_completed );
     cout << "Total execution time: " << sc_time_stamp() << endl;
     // end LaiYang
 
