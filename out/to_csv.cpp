@@ -150,16 +150,16 @@ int main( int argc, char* argv[] )
 				ret |= SD( buf, "User Page Write: ", pw );
 				ret |= SD_unit( buf, "Total execution time: ", t, unit );
 
-				if( unit=="ns" ){
+				if( strcmp(unit,"ns")==0 ){
 					t /= (double)1000.0*1000.0*1000.0;
 				}
-				else if( unit=="us" ){
+				else if( strcmp(unit,"us")==0 ){
 					t /= (double)1000.0*1000.0;
 				}
-				else if( unit=="ms" ){
+				else if( strcmp(unit,"ms")==0 ){
 					t /= (double)1000.0;
 				}
-				else if( unit=="s" ){
+				else if( strcmp(unit,"s")==0 ){
 					t /= (double)1;
 				}
 
