@@ -89,6 +89,22 @@ int SD( const char* s, const char* ss, double& d )
 	return 0;	
 }
 
+int SD_unit( const char* s, const char* ss, double& d, char* unit )
+{
+	s = strstr(s,ss);
+	if( s==NULL ){
+		printf("Word not found: %s\n",ss);
+		return -1;//H_error("No match word found !!");
+	}
+
+	s += strlen(ss);
+	sscanf( s, "%lf%s", &d, unit  );
+
+	//printf("%s\nHL=%f",s,d);
+
+	return 0;	
+}
+
 int RF( FILE* fp, char* s )
 {
 	int cnt=0;
@@ -120,6 +136,7 @@ int main( int argc, char* argv[] )
 				char fn[100];
 				double pr,pw,t;
 				int ret=0;
+				char unit[100];
 
 				sprintf( fn, "%s_%d_%d", workload_short[wd], p1[i], p2[j] );
 				//printf("%s\n",fn);
@@ -131,9 +148,21 @@ int main( int argc, char* argv[] )
 
 				ret |= SD( buf, "User Page Read: ", pr );
 				ret |= SD( buf, "User Page Write: ", pw );
-				ret |= SD( buf, "Total execution time: ", t );
+				ret |= SD_unit( buf, "Total execution time: ", t, unit );
 
-				t /= (double)1000.0*1000.0*1000.0*1000.0;
+				if( unit=="ns" ){
+					t /= (double)1000.0*1000.0*1000.0;
+				}
+				else if( unit=="us" ){
+					t /= (double)1000.0*1000.0;
+				}
+				else if( unit=="ms" ){
+					t /= (double)1000.0;
+				}
+				else if( unit=="s" ){
+					t /= (double)1;
+				}
+
 
 				if( ret != 0 ){
 					fprintf( ofp, "%f,", 0 );
