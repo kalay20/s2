@@ -25,7 +25,7 @@ bool all_req_completed=false;
 // end LaiYang
 
 
-#define CYCLE_DRIVEN
+//#define CYCLE_DRIVEN
 
 #ifdef CYCLE_DRIVEN
 // LaiYang
