@@ -58,7 +58,7 @@ change=${change:-1}
 
 
 
-prefix_old=(wl_die block_size_config 3_factor el_die bs_die ch_die )
+prefix=(wl_die block_size_config 3_factor el_die bs_die ch_die )
 config_dir="config/${prefix["$change"-1]}"
 exec_dir="exec/${prefix["$change"-1]}"
 out_dir="out/${prefix["$change"-1]}"
