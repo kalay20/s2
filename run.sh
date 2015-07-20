@@ -19,7 +19,8 @@ if_test=${if_test:-0}
 
 wd_burst=${wd_burst:-0}
 wd_start=${wd_start:-0}
-wd_end=${wd_end:-1}
+wd_end=${wd_end:-6}
+wd_bool=( 1 0 0 0 0 0 )
 workload_prefix=( mse msn msl usr1 src10 synf )
 workload_burst_suffix=burst
 workload_origin_path=( /home/r01/gengyouchen/ssd_trace/ms_exchange_server.trace /home/r01/gengyouchen/ssd_trace/msn_fs.trace /home/r01/gengyouchen/ssd_trace/ms_live_maps.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/usr_1.trace /home/r01/gengyouchen/ssd_trace/MSRC-io-traces-ascii/src1_0.trace /home/r01/gengyouchen/ssd_trace/synthetic_overload_full.trace )
@@ -29,14 +30,17 @@ workload_short=()
 
 for (( wn="$wd_start"; wn<"$wd_end"; wn++ ))
 do
-	if [ "$wd_burst" -eq 0 ]
+	if [ "${wd_bool["$wn"]}" -eq 1 ]
 	then
-		workload["$wn"]="${workload_origin_path["$wn"]}"
-		workload_short["$wn"]="${workload_prefix["$wn"]}"
-	elif [ "$wd_burst" -eq 1 ]
-	then
-		workload["$wn"]="$workload_burst_path_prefix"/"${workload_prefix["$wn"]}"_"$workload_burst_suffix".trace
-		workload_short["$wn"]="${workload_prefix["$wn"]}"_b
+		if [ "$wd_burst" -eq 0 ]
+		then
+			workload["$wn"]="${workload_origin_path["$wn"]}"
+			workload_short["$wn"]="${workload_prefix["$wn"]}"
+		elif [ "$wd_burst" -eq 1 ]
+		then
+			workload["$wn"]="$workload_burst_path_prefix"/"${workload_prefix["$wn"]}"_"$workload_burst_suffix".trace
+			workload_short["$wn"]="${workload_prefix["$wn"]}"_b
+		fi
 	fi
 done
 
@@ -52,7 +56,9 @@ change=${change:-1}
 # 1=die number
 # 2=block size
 
-prefix=(wl_die block_size_config 3_factor el_die bs_die ch_die )
+
+
+prefix_old=(wl_die block_size_config 3_factor el_die bs_die ch_die )
 config_dir="config/${prefix["$change"-1]}"
 exec_dir="exec/${prefix["$change"-1]}"
 out_dir="out/${prefix["$change"-1]}"

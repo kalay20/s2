@@ -30,6 +30,37 @@ exec_dir="exec/${prefix["$change"-1]}"
 out_dir="out/${prefix["$change"-1]}"
 
 
+is_config=${is_config:-1}
+source ./param.sh
+
+function Re {
+	index=${2:-()}
+	#index=$2
+	if (( $1==$pt ))
+	then
+		t1=${index[0]}; t2=${pA0[$t1]}
+		printf "%d" "$t2"
+		t1=${index[1]}; t2=${pA1[$t1]}
+		printf "_%d\n" "$t2"
+		return
+	fi
+	#m=0
+	#s="p[0]=\${pA$m[\$]}"
+	#eval $s
+	local p_i
+	for (( p_i=${p_start[$1]}; p_i<${p_end[$1]}; p_i++ ))
+	do
+		index[$1]=$p_i
+		Re $(($1+1)) $index
+	done
+}
+
+Re 0
+echo
+
+
+: << END
+
 if [ $change -eq 1 ]; then
 
 	for (( i="$wl_start"; i<"$wl_end"; i++ ))
@@ -103,7 +134,7 @@ elif [ $change -eq 6 ] ; then
 	done
 fi
 
-
+END
 
 
 
