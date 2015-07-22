@@ -29,7 +29,9 @@ config_dir="config/${prefix["$change"-1]}"
 exec_dir="exec/${prefix["$change"-1]}"
 out_dir="out/${prefix["$change"-1]}"
 
-: << END
+#: << END
+
+
 is_config=${is_config:-1}
 source ./param.sh
 
@@ -37,20 +39,23 @@ IssueCommand()
 {
 	local pt=$1
 	local index=("${!2}")
+	local p=()
 	local name
 	local t
-	local p
+	local r
 	local i
 	local pA
 	local s
 	
 	for (( i=0; i<$pt; i++ ))
 	do
-		t=${index[$i]}; s="p=\${pA$i[\$t]}"; eval $s
-		name=$name"_"$p
+		t=${index[$i]}; s="r=\${pA$i[\$t]}"; eval $s
+		p[$i]=$r
+		name=$name"_"$r
 	done
 	
-	echo "name" $name
+	echo "name=" $name
+	Param_Shell $name p[@]
 }
 
 index=()
@@ -81,9 +86,9 @@ Re()
 ta=( 1 2 )
 IssueCommand 2 ta[@]
 
-END
+#END
 
-#: << END
+: << END
 
 if [ $change -eq 1 ]; then
 
@@ -158,7 +163,7 @@ elif [ $change -eq 6 ] ; then
 	done
 fi
 
-#END
+END
 
 
 
