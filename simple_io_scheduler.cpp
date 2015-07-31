@@ -466,6 +466,7 @@ void simple_io_scheduler::on_recv_completed(int bus_id) {
 #endif
 #ifdef IO_SCHEDULER__RECORD_READ_LATENCY
 				m_rd_req_resp_pmf.record_value(resp_time);
+				m_req_resp_pmf.record_read_value(resp_time);
 #endif
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
 				m_sampled_rd_req_latency_pmf.record_value(resp_time);
@@ -477,6 +478,7 @@ void simple_io_scheduler::on_recv_completed(int bus_id) {
 #endif
 #ifdef IO_SCHEDULER__RECORD_WRITE_LATENCY
 				m_wr_req_resp_pmf.record_value(resp_time);
+				m_req_resp_pmf.record_write_value(resp_time);
 #endif
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
 				m_sampled_wr_req_latency_pmf.record_value(resp_time);
