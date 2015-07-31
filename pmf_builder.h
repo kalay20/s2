@@ -15,11 +15,17 @@ class pmf_builder {
 
 		pmf_builder();
 		void record_value(const value_t& value);
+		void record_read_value(const value_t& value);
+		void record_write_value(const value_t& value);
 
 		unsigned long long count() const;
 		unsigned long long count_with_range(value_t min, value_t max) const;
 		value_t sum() const;
+		value_t read_sum() const;
+		value_t write_sum() const;
 		value_t avg() const;
+		value_t read_avg() const;
+		value_t write_avg() const;
 		value_t max() const;
 		value_t min() const;
 		value_t percentile(long double rank) const;
@@ -28,13 +34,21 @@ class pmf_builder {
 	private:
 		value_count_map_t value_count_map;
 		value_t sum_of_all_values;
+		value_t sum_of_read_values;
+		value_t sum_of_write_values;
 		unsigned long long sum_of_all_value_counts;
+		unsigned long long sum_of_read_value_counts;
+		unsigned long long sum_of_write_value_counts;
 };
 
 template<typename value_t>
 pmf_builder<value_t>::pmf_builder() {
 	sum_of_all_values = 0;
+	sum_of_read_values = 0;
+	sum_of_write_values = 0;
 	sum_of_all_value_counts = 0;
+	sum_of_read_value_counts = 0;
+	sum_of_write_value_counts = 0;
 }
 
 template<typename value_t>
@@ -42,6 +56,18 @@ void pmf_builder<value_t>::record_value(const value_t& value) {
 	value_count_map.insert(value_counter_t(value, 0)).first->second++;
 	sum_of_all_values += value;
 	sum_of_all_value_counts++;
+}
+
+template<typename value_t>
+void pmf_builder<value_t>::record_read_value(const value_t& value) {
+	sum_of_read_values += value;
+	sum_of_read_value_counts++;
+}
+
+template<typename value_t>
+void pmf_builder<value_t>::record_write_value(const value_t& value) {
+	sum_of_write_values += value;
+	sum_of_write_value_counts++;
 }
 
 template<typename value_t>
@@ -55,9 +81,37 @@ value_t pmf_builder<value_t>::sum() const {
 }
 
 template<typename value_t>
+value_t pmf_builder<value_t>::read_sum() const {
+	return sum_of_read_values;
+}
+
+template<typename value_t>
+value_t pmf_builder<value_t>::write_sum() const {
+	return sum_of_write_values;
+}
+
+template<typename value_t>
 value_t pmf_builder<value_t>::avg() const {
 	if (sum_of_all_value_counts > 0) {
 		return sum_of_all_values / sum_of_all_value_counts;
+	} else {
+		return 0;
+	}
+}
+
+template<typename value_t>
+value_t pmf_builder<value_t>::read_avg() const {
+	if (sum_of_read_value_counts > 0) {
+		return sum_of_read_values / sum_of_read_value_counts;
+	} else {
+		return 0;
+	}
+}
+
+template<typename value_t>
+value_t pmf_builder<value_t>::write_avg() const {
+	if (sum_of_write_value_counts > 0) {
+		return sum_of_write_values / sum_of_write_value_counts;
 	} else {
 		return 0;
 	}
@@ -101,7 +155,11 @@ value_t pmf_builder<value_t>::percentile(long double rank) const {
 template<typename value_t>
 void pmf_builder<value_t>::reset() {
 	sum_of_all_values = 0;
+	sum_of_read_values = 0;
+	sum_of_write_values = 0;
 	sum_of_all_value_counts = 0;
+	sum_of_read_value_counts = 0;
+	sum_of_write_value_counts = 0;
 	value_count_map.clear();
 }
 
