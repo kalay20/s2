@@ -76,6 +76,15 @@ unsigned long long pmf_builder<value_t>::count() const {
 }
 
 template<typename value_t>
+unsigned long long pmf_builder<value_t>::read_count() const {
+	return sum_of_read_value_counts;
+}
+
+template<typename value_t>
+unsigned long long pmf_builder<value_t>::write_count() const {
+	return sum_of_write_value_counts;
+}
+template<typename value_t>
 value_t pmf_builder<value_t>::sum() const {
 	return sum_of_all_values;
 }
