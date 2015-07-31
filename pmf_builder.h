@@ -19,6 +19,8 @@ class pmf_builder {
 		void record_write_value(const value_t& value);
 
 		unsigned long long count() const;
+		unsigned long long read_count() const;
+		unsigned long long write_count() const;
 		unsigned long long count_with_range(value_t min, value_t max) const;
 		value_t sum() const;
 		value_t read_sum() const;
