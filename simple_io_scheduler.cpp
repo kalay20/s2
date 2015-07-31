@@ -307,7 +307,11 @@ void simple_io_scheduler::print_score() const {
 
 #ifdef IO_SCHEDULER__RECORD_ALL_LATENCY
 	cout << "For total " << m_req_resp_pmf.count() << " I/O requests:" << endl;
+	cout << '\t' << "total read = " << m_req_resp_pmf.read_count() << " requests" << endl;
+	cout << '\t' << "total write = " << m_req_resp_pmf.write_count() << " requests" << endl;
 	cout << '\t' << "average I/O latency = " << m_req_resp_pmf.avg() << " ms" << endl;
+	cout << '\t' << "average read latency = " << m_req_resp_pmf.read_avg() << " ms" << endl;
+	cout << '\t' << "average write latency = " << m_req_resp_pmf.write_avg() << " ms" << endl;
 	cout << '\t' << "99th percentile I/O latency = " << m_req_resp_pmf.percentile(0.99) << " ms" << endl;
 	cout << '\t' << "Number of Requests = " << m_req_resp_pmf.count() << endl;
 	cout << '\t' << "Number of SLO Miss Requests = " << m_req_resp_pmf.count_with_range(
@@ -463,10 +467,10 @@ void simple_io_scheduler::on_recv_completed(int bus_id) {
 			case SSD_REQ_TYP_RD:
 #ifdef IO_SCHEDULER__RECORD_ALL_LATENCY
 				m_req_resp_pmf.record_value(resp_time);
+				m_req_resp_pmf.record_read_value(resp_time);
 #endif
 #ifdef IO_SCHEDULER__RECORD_READ_LATENCY
 				m_rd_req_resp_pmf.record_value(resp_time);
-				m_req_resp_pmf.record_read_value(resp_time);
 #endif
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
 				m_sampled_rd_req_latency_pmf.record_value(resp_time);
@@ -475,10 +479,10 @@ void simple_io_scheduler::on_recv_completed(int bus_id) {
 			case SSD_REQ_TYP_WR:
 #ifdef IO_SCHEDULER__RECORD_ALL_LATENCY
 				m_req_resp_pmf.record_value(resp_time);
+				m_req_resp_pmf.record_write_value(resp_time);
 #endif
 #ifdef IO_SCHEDULER__RECORD_WRITE_LATENCY
 				m_wr_req_resp_pmf.record_value(resp_time);
-				m_req_resp_pmf.record_write_value(resp_time);
 #endif
 #ifdef GYC_PAPER_REQ_LATENCY_PLOT
 				m_sampled_wr_req_latency_pmf.record_value(resp_time);
