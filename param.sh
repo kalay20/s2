@@ -168,8 +168,8 @@ elif [ "$change" -eq 8 ]; then
 
 
 		wl=$(awk "BEGIN {printf \"%.3f\",$wl_base*${p[0]}/100}")
-		rl=$(awk "BEGIN {printf \"%.3f\",$rl_base*${p[0]}/100}")
-		dn=$(awk "BEGIN {printf \"%.0f\",$dn_base*${p[1]}/100}")
+		rl=$(awk "BEGIN {printf \"%.3f\",$rl_base*${p[1]}/100}")
+		dn=$(awk "BEGIN {printf \"%.0f\",$dn_base*${p[2]}/100}")
 		block_per_die=$(($block_per_die_base*$dn_base/$dn))
 
 		#echo "wl=" $wl ", dn=" $dn
