@@ -20,9 +20,9 @@ const int ch_end=5;
 //int dn[6] = {20,40,80,160,320,640};
 
 int el[]={ 100, 150, 200, 250, 300 };
-int	wl[]={ 100, 150, 200, 250, 300 };
-int	dn[]={ 64, 80, 96, 112, 128 };
-int	bs[]={ 128, 256, 512, 1024 };
+int wl[]={ 100, 150, 200, 250, 300 };
+int dn[]={ 64, 80, 96, 112, 128 };
+int bs[]={ 128, 256, 512, 1024 };
 int ch[]={ 1, 2, 4, 8, 16 };
 
 
@@ -32,7 +32,7 @@ char workload_short_ori[workload_size][10] = {"mse","msn","msl","usr1","src10","
 char workload_short[workload_size][10];
 
 // ---------------------- change ------------------------------------
-int workload_bool[] = {1,1,1,1,1,1};
+int workload_bool[] = {1,0,0,0,0,0};
 const int change=1;
 const int burst=0;
 
