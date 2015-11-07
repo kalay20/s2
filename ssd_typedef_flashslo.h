@@ -12,14 +12,14 @@
 #define PLANE_PER_DIE 2
 #define BYTE_PER_SECTOR 512
 #define SECTOR_PER_PAGE (16 * PLANE_PER_DIE)
-#define PAGE_PER_BLOCK 128
-#define BLOCK_PER_DIE (8192 / PLANE_PER_DIE)
+#define PAGE_PER_BLOCK 516
+#define BLOCK_PER_DIE (2048 / PLANE_PER_DIE)
 
 #define HOST_BUS_IO_CYCLE ((msec_t) 0.00000025)
 #define HOST_BUS_HEADER_SIZE 16
 
 #define SSD_QUEUE_DEPTH 512
-#define SSD_CHANNEL_NUMBER 8
+#define SSD_CHANNEL_NUMBER 32
 #define SSD_OVER_PROVISIONING_PERCENTAGE 15
 
 #define PHYSICAL_CAPACITY_IN_PAGE_PER_DIE (PAGE_PER_BLOCK * BLOCK_PER_DIE)
@@ -32,9 +32,9 @@
 
 /* Assume each 8GB MLC die has the read latency, the page program latnecy in SLC / MLC, and the erase latency */
 /*     characterized in Wear Unleveling: Improving NAND Flash Lifetime by Balancing Page Endurance (FAST '14) */
-#define MLC_READ_LATENCY ((msec_t) 0.090)
-#define MLC_PROGRAM_LATENCY ((msec_t) 0.600)
-#define MLC_ERASE_LATENCY ((msec_t) 3.000)
+#define MLC_READ_LATENCY ((msec_t) 0.220)
+#define MLC_PROGRAM_LATENCY ((msec_t) (0.800 + 3.400 + 7.600) / 3)
+#define MLC_ERASE_LATENCY ((msec_t) 5.000)
 #define SLC_PROGRAM_LATENCY ((msec_t) 0.400)
 
 #define CHANNEL_READ_INPUT_LATENCY (CHANNEL_IO_CYCLE * (BYTE_PER_COMMAND + BYTE_PER_ADDRESS))
@@ -44,7 +44,7 @@
 #define CHANNEL_ERASE_INPUT_LATENCY (CHANNEL_IO_CYCLE * (BYTE_PER_COMMAND + BYTE_PER_ADDRESS))
 #define CHANNEL_ERASE_OUTPUT_LATENCY (CHANNEL_IO_CYCLE * BYTE_PER_STATUS)
 
-#define ADD_DUMMY_TO_INITIAL_LAYOUT
+//#define ADD_DUMMY_TO_INITIAL_LAYOUT
 
 #define DEADLINE_AWARE_SLC_POLICY
 #define DEADLINE_AWARE_SLC_POLICY_DEADLINE ((msec_t) 100.0)
