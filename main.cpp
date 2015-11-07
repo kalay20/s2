@@ -66,15 +66,15 @@ void Initialize_sc_main(int argc, char* argv[] )
 	pthread_t tid;
 
 	if( sem_init(&mutex,1,0)<0 ){
-		perror("mutex initial fall.\n");
+		perror("mutex initial fail.\n");
 		exit(-1);
 	}
 	if( sem_init(&m2,1,0)<0 ){
-		perror("mutex initial fall.\n");
+		perror("mutex initial fail.\n");
 		exit(-1);
 	}
 	if( sem_init(&mb,1,0)<0 ){
-		perror("mutex initial fall.\n");
+		perror("mutex initial fail.\n");
 		exit(-1);
 	}
 
@@ -314,8 +314,8 @@ int sc_main(int argc, char* argv[]) {
 	
 	// LaiYang
 	assert( all_req_completed );
-    cout << "Total execution time: " << sc_time_stamp() << endl;
-    // end LaiYang
+    	cout << "Total execution time: " << sc_time_stamp() << endl;
+    	// end LaiYang
 
 	ssd.debug_check_all_req_completed();
 	host.print_score();
