@@ -91,7 +91,7 @@ simple_ssd_controller::simple_ssd_controller (
 	epoch_time_next = epoch_time_now + epoch_length;
 	
 	el=sc_time(100,SC_MS);
-	SC_THREAD(spiner)
+	//SC_THREAD(spiner)
 	// end LaiYang
 #ifdef GYC_PAPER_D_MONITOR
 	m_mlc_clean_amount = 0.0;
@@ -239,7 +239,9 @@ void simple_ssd_controller::debug_check_all_req_completed() const {
 	ppn_t total_number_of_gc_page_write_f = 0;
 	ppn_t total_number_of_gc_page_write_b = 0;
 	// end LaiYang
-
+	// Ana
+	cout << "**************************** Foreground GC per Die ****************************"<<endl;
+	// end Ana
 	for (int die_idx = 0; die_idx < die_schedulers.size(); die_idx++) {
 
 #if 0
@@ -278,11 +280,18 @@ void simple_ssd_controller::debug_check_all_req_completed() const {
                 total_number_of_gc_page_write_f += die_schedulers[die_idx]->number_of_gc_page_write_f;
                 total_number_of_gc_page_write_b += die_schedulers[die_idx]->number_of_gc_page_write_b;
                 total_number_of_gc_page_erase_f += die_schedulers[die_idx]->number_of_gc_page_erase_f;
-                total_number_of_gc_page_erase_b += die_schedulers[die_idx]->number_of_gc_page_erase_b;
+		// Ana
+		cout << "Die: " << die_idx << "# of foreground_gc: " << die_schedulers[die_idx]->number_of_gc_page_erase_f << endl;                
+		// end Ana
+		total_number_of_gc_page_erase_b += die_schedulers[die_idx]->number_of_gc_page_erase_b;
                 // end LaiYang
 
 	}
-        // LaiYang
+	// Ana
+	cout << "************************** end of foreground gc per die ************************" << endl;
+	// end Ana
+
+	// LaiYang
         cout << " total gc: " << total_number_of_gc << endl;
         cout << " avg live page copy per gc: " << (double)total_number_live_copy_gc / (double)total_number_of_gc << endl;
         // end LaiYang
