@@ -15,8 +15,6 @@
 #include "simple_die_scheduler.h"
 #include "simple_die_ftl.h"
 
-#define jiawei_die
-
 using namespace std;
 using namespace sc_core;
 
@@ -648,7 +646,7 @@ void simple_ssd_controller::on_recv_completed(int bus_id) {
 					die_schedulers[die_index]->schedule_io_page_read(m_recv_buf, die_op_lpn);
 					break;
 				case SSD_REQ_TYP_WR:
-#ifdef jiawei_die
+#ifdef OLD_PAGE_ALLOCATION		// Original page allocation implementation
 					die_index = m_die_idx;
 					m_die_idx += ch_array.size();
 					if (m_die_idx > m_number_of_die -1){
@@ -658,7 +656,7 @@ void simple_ssd_controller::on_recv_completed(int bus_id) {
 					die_index = m_die_idx;
 					die_schedulers[die_index]->schedule_io_page_write(m_recv_buf, die_op_lpn);
 					break;
-#else 					//LaiYang_die
+#else 					//LaiYang_die (laiyang page allocation implementation)
 					die_index = m_die_idx;
 					m_die_idx++;
 					if (m_die_idx > m_number_of_die -1){
