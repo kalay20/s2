@@ -45,7 +45,7 @@
 #define CHANNEL_ERASE_OUTPUT_LATENCY (CHANNEL_IO_CYCLE * BYTE_PER_STATUS)
 
 #define ADD_DUMMY_TO_INITIAL_LAYOUT	// Utilization simulation
-#define OLD_PAGE_ALLOCATION		// Original page allocation
+#define OLD_DATA_ALLOCATION		// Original page allocation
 
 #define DEADLINE_AWARE_SLC_POLICY
 #define DEADLINE_AWARE_SLC_POLICY_DEADLINE ((msec_t) 100.0)
